@@ -115,5 +115,3 @@ for iter=1:50
     w_prom(iter)=mean(W(1:N));
     w2_prom(iter)=sum(W(1:N))/N;
 end
-
-
