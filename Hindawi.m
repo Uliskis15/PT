@@ -20,7 +20,7 @@ TAb=zeros(1,N+1);%Vector para tasa de abandono
 tao_mw=zeros(1,N);%Vector para tasa de abandono
 
 %Comienza el ciclo repetitivo
-for iter=1:50
+for iter=1:10
     
     %Caso estado (0,0,0,....,1)
     if W(1:N)==0%Arribo porque las poblaciones de 0 a N son 0 
