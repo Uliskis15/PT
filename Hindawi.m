@@ -13,14 +13,14 @@ cw=N*c;%Tasa de descarga máxima
 mw=N*mu;%Tasa de subida máxima
 W=zeros(1,N+1);%Vector de poblaciones por ventana de video
 W(N+1)=1;%Estado Inicial (0,0,0,0,...,1)
-tp=zeros(1,N+1);%Vector de tiempos promedio por ventana
-wi=zeros(1,N+1);%Vector de poblaciones para generar V.A.
-W_prom=zeros(1,N+1);%Vector de poblaciones para generar V.A.
+tp=0;%Vector de tiempos promedio por ventana
+w_prom=0;%Poblaciones promedio de downloaders
+y_prom=0;%Población promedio de seeds
 TAb=zeros(1,N+1);%Vector para tasa de abandono
 tao_mw=zeros(1,N);%Vector para tasa de abandono
 
 %Comienza el ciclo repetitivo
-for iter=1:50000
+for iter=1:500
     
     %Caso estado (0,0,0,....,1)
     if W(1:N)==0%Arribo porque las poblaciones de 0 a N son 0 
@@ -108,9 +108,10 @@ for iter=1:50000
            W(idx+1)=W(idx+1)+1;%Incrementar W en idx+1
            tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
         end 
-        w_prom=sum(W(1:N))*Evfinal;
-        W_prom(iter)=w_prom/sum(tp);
+        w_prom=w_prom+(sum(W(1:N))*Evfinal);
+        y_prom=y_prom+(W(N+1)*Evfinal);
     end 
     W;
-    X_prom=sum(W_prom);
+    X_prom=w_prom/tp;
+    Y_prom=y_prom/tp;
 end
