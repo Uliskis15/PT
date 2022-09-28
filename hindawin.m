@@ -4,14 +4,14 @@ close all
 %Declaración de Variables
 
 N=[96 84 72 60 48 36 24];% Número de ventanas
-teta=[2 4 6 8 10].^-3;%Tasa de abandono general
+teta=[2 4 6 8 10].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
 gamma=0.006;%Tasa de abandono general de los seeds
 X_prom=zeros(length(N),length(teta));%Matriz de downloaders promedio
 Y_prom=zeros(length(N),length(teta));%Matriz de seeds promedio
-IT=10000;
+IT=100000;
 
 for idxn=1:length(N)
         
