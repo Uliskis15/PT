@@ -11,7 +11,7 @@ mu=0.00255;%Tasa de subida general
 gamma=0.006;%Tasa de abandono general de los seeds
 X_prom=zeros(length(N),length(teta));%Matriz de downloaders promedio
 Y_prom=zeros(length(N),length(teta));%Matriz de seeds promedio
-IT=100000;
+IT=50000;
 
 for idxn=1:length(N)
         
@@ -130,6 +130,7 @@ end
 figure(1)
 surf(N,teta,transpose(X_prom),'FaceAlpha',0.5)
 xticks([24:12:96])
+zlim([0 12])
 ylabel('x10^{-3}           \theta')
 xlabel('N')
 zlabel('x')
@@ -138,6 +139,7 @@ title('Número de leeches en equilibrio')
 figure(2)
 surf(N,teta,transpose(Y_prom),'FaceAlpha',0.5)
 xticks([24:12:96])
+zlim([0 6])
 ylabel('x10^{-3}           \theta')
 xlabel('N')
 zlabel('y')
