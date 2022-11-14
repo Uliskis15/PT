@@ -11,7 +11,7 @@ mu=0.00255;%Tasa de subida general
 P=0.00245;%Tasa de subida general
 teta0=0.006;%Tasa de abandono para usuarios en ventana 0
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
-IT=25000;
+IT=5;
 
 for idxc=1:length(C)
         
@@ -26,8 +26,10 @@ for idxc=1:length(C)
       tp=0;%Vector de tiempos promedio por ventana
       TAb=zeros(1,C(idxc)+1);%Vector para tasa de abandono
       tab=zeros(1,C(idxc)+1);%Vector para tasa de abandono
-      tao_mw=zeros(1,C(idxc));%Vector para tasa de abandono
-      TTran=zeros(1,C(idxc));%Vector para tasa de abandono
+      tao_mw=zeros(1,C(idxc));%Vector para tasa de subida
+      ttran=zeros(1,C(idxc));%Vector para tasa de producción
+      TProd=zeros(1,C(idxc));%Vector para tasa de transferencia inferior
+      TTran=zeros(1,C(idxc));%Vector para tasa de transferencia superior
             
       for iter=1:IT
           
@@ -38,9 +40,10 @@ for idxc=1:length(C)
           %Caso estado ~= (0,0,0,....,1)
           else%Determinar evento porque las poblaciones de 0 a N son ~=0
               
-              %Generar tasas de arribo y abandono por ventana
+              %Generar tasas de arribo, abandono y transferencia a la ventana inferior por ventana
               TArr=1/lmb;%Tasa promedio de arribo a la ventana 0
               TAb=teta(idxt)*HV(1:C(idxc)+1);
+              ttran=Pw*HV(2:C(idxc)+1);
               
               %Tranferencia para usuarios en ventanas 0 a N-1        
               tao_cw=cw*HV(1:C(idxc));%Tasa promedio de descarga en abundancia
@@ -53,15 +56,17 @@ for idxc=1:length(C)
               end
 
               
-              %Obtener V.A con las tasas de arribo, abandono y transferencia
+              %Obtener V.A con las tasas de arribo, abandono,
+              %producción(tranferencia inferior) y transferencia superior
               tao_min=min(tao_cw,tao_mw);%Tasa promedio de descarga en la ventana i
 
               VEArr=exprnd(TArr);%V.A para arribos
               ab=exprnd(1./TAb);%Vector de V.As para abandonos
-              tran=exprnd(1./tao_min);%Vector de V.As para transferencias
+              prod=exprnd(1./ttran);%Vector de V.A para tranferencias inferiores
+              tran=exprnd(1./tao_min);%Vector de V.As para transferencias superiores
 
               %Tiempos infinitos para descartar un abandono o transferencia
-              %inválida             
+              %inválido             
               for idxab=1:C(idxc)+1%Cambir el vector a infinitos para descartar poblaciones en 0
                   if(ab(idxab)==0)
                      tab(idxab)=inf;
@@ -70,6 +75,15 @@ for idxc=1:length(C)
                   end
               end
               VEAb=min(tab);% Obtener minimo de ab
+              
+              for idxpw=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
+                  if(prod(idxpw)==0)
+                     TProd(idxpw)=inf;
+                  else
+                     TProd(idxpw)=prod(idxpw);
+                  end
+              end
+              VEPw=min(TProd);% Obtener minimo de prod
 
               for idxtao=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
                   if(tran(idxtao)==0)
@@ -81,8 +95,9 @@ for idxc=1:length(C)
               VETao=min(TTran);% Obtener minimo de tran
 
               %Obtener el evento que ocurrio
-              Evsucces=min(VEArr,VEAb);
-              Evfinal=min(Evsucces,VETao);
+              Evsucces1=min(VEArr,VEAb);
+              Evsucces2=min(VEPw,VETao);
+              Evfinal=min(Evsucces1,Evsucces2);
 
              %Incrementar o decrementar la población de una ventana dependiendo 
              %del evento ocurrido y de la ventana en donde ocurrio
@@ -97,6 +112,12 @@ for idxc=1:length(C)
 
                 HV(1)=HV(1)+1;%Incrementar W en 1
                 tp=tp+VEArr;%Se suma el tiempo promedio a tp en 1
+                
+             elseif Evfinal==VEPw
+                idx=find(prod==VEPw);%Encontrar indice donde ab == VEAb
+                HV(idx+1)=HV(idx+1)-1;%Decrementar W en idx
+                HV(idx)=HV(idx)+1;%Incrementar W en idx-1
+                tp=tp+VEPw;%Se suma el tiempo promedio a tp en idx
 
              elseif Evfinal==VETao
                 idx=find(tran==VETao);%Encontrar indice donde ab == VEAb
@@ -106,6 +127,7 @@ for idxc=1:length(C)
              end 
                 xi_prom=xi_prom+(sum(HV(1:C(idxc)+1))*Evfinal);                
           end
+          HV
           x_prom=xi_prom/tp;                    
       end
          %Obtener los promedios de seeds y downloaders para distintos
@@ -114,13 +136,13 @@ for idxc=1:length(C)
    end        
 end
      
-figure(1)
-surf(C,teta,transpose(X_prom),'FaceAlpha',0.5)
-xticks([12:4:36])
-yticks([0.002:0.001:0.01])
-%zticks([0:2:12])
-%zlim([0 12])
-ylabel('\theta')
-xlabel('C')
-zlabel('x')
-title('Número de downloaders en equilibrio')
+% figure(1)
+% surf(C,teta,transpose(X_prom),'FaceAlpha',0.5)
+% xticks([12:4:36])
+% yticks([0.002:0.001:0.01])
+% %zticks([0:2:12])
+% %zlim([0 12])
+% ylabel('\theta')
+% xlabel('C')
+% zlabel('x')
+% title('Número de downloaders en equilibrio')
