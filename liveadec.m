@@ -11,7 +11,7 @@ mu=0.00255;%Tasa de subida general
 P=0.00245;%Tasa de subida general
 teta0=0.006;%Tasa de abandono para usuarios en ventana 0
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
-IT=5;
+IT=25000;
 
 for idxc=1:length(C)
         
@@ -42,7 +42,8 @@ for idxc=1:length(C)
               
               %Generar tasas de arribo, abandono y transferencia a la ventana inferior por ventana
               TArr=1/lmb;%Tasa promedio de arribo a la ventana 0
-              TAb=teta(idxt)*HV(2:C(idxc));
+              TAb(1)=teta0*HV(1);
+              TAb(2:C(idxc))=teta(idxt)*HV(2:C(idxc));
               ttran=Pw*HV(2:C(idxc));
               
               Si=HV(C(idxc)+1);
@@ -136,23 +137,23 @@ for idxc=1:length(C)
              end 
                 xi_prom=xi_prom+(sum(HV(1:C(idxc)+1))*Evfinal);                
           end
-          HV
+          %HV
           x_prom=xi_prom/tp;                    
       end
          %Obtener los promedios de seeds y downloaders para distintos
          %valores  de N y teta 
          X_prom(idxc,idxt)=x_prom;
-         disp('------');
+         %disp('------');
    end        
 end
      
-% figure(1)
-% surf(C,teta,transpose(X_prom),'FaceAlpha',0.5)
-% xticks([12:4:36])
-% yticks([0.002:0.001:0.01])
-% %zticks([0:2:12])
-% %zlim([0 12])
-% ylabel('\theta')
-% xlabel('C')
-% zlabel('x')
-% title('Número de downloaders en equilibrio')
+figure(1)
+surf(C,teta,transpose(X_prom),'FaceAlpha',0.5)
+xticks([12:4:36])
+yticks([0.002:0.001:0.01])
+%zticks([0:2:12])
+%zlim([0 12])
+ylabel('\theta')
+xlabel('C')
+zlabel('x')
+title('Número de downloaders en equilibrio')
