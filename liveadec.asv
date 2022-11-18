@@ -48,10 +48,10 @@ for idxc=1:length(C)
               Si=HV(C(idxc)+1);
               if Si >= 2
                  TAb(C(idxc)+1)=teta(idxt)*(Si-1);
-                 ttran(C(idxc)+1)=Pw*HV(C(idxc)+1);
+                 ttran()=Pw*HV(C(idxc)+1);
               else
                  TAb(C(idxc)+1)=inf;
-                 ttran(C(idxc)+1)=inf;
+                 ttran=Pw*HV(C(idxc)+1);
               end
               
               %Tranferencia para usuarios en ventanas 0 a N-1        
