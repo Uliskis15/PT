@@ -8,10 +8,10 @@ teta=[2 4 6 8 10].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
-P=0.00245;%Tasa de subida general
+P=0.00245;%Tasa de producción del video
 teta0=0.006;%Tasa de abandono para usuarios en ventana 0
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
-IT=25000;
+IT=25000;%Número de iteraciones
 
 for idxc=1:length(C)
         
@@ -20,7 +20,7 @@ for idxc=1:length(C)
       cw=C(idxc)*c;%Tasa de descarga máxima
       mw=C(idxc)*mu;%Tasa de subida máxima
       Pw=C(idxc)*P;%Tasa de producción del video
-      HV=zeros(1,C(idxc)+1);%Vector de poblaciones por ventana de video
+      HV=zeros(1,C(idxc)+1);%Vector de poblaciones por ventana de la hiperventana
       HV(C(idxc)+1)=1;%Estado Inicial (0,0,0,0,...,1)
       xi_prom=0;%Cadena acumulativa para obtener el promedio por iteración
       tp=0;%Vector de tiempos promedio por ventana
@@ -34,28 +34,30 @@ for idxc=1:length(C)
       for iter=1:IT
           
           %Caso estado (0,0,0,....,1)
-          if HV(1:C(idxc))==0%Arribo porque las poblaciones de 0 a N son 0 
+          if HV(1:C(idxc))==0%Arribo porque las poblaciones de 0 a C son 0 
              HV(1)=HV(1)+1;
              tp=tp+exprnd(1/lmb);      
           %Caso estado ~= (0,0,0,....,1)
-          else%Determinar evento porque las poblaciones de 0 a N son ~=0
+          else%Determinar evento porque las poblaciones de 0 a C son ~=0
               
               %Generar tasas de arribo, abandono y transferencia a la ventana inferior por ventana
               TArr=1/lmb;%Tasa promedio de arribo a la ventana 0
-              TAb(1)=teta0*HV(1);
-              TAb(2:C(idxc))=teta(idxt)*HV(2:C(idxc));
-              ttran=Pw*HV(2:C(idxc));
+              TAb(1)=teta0*HV(1);%Tasa promedio de abandono de la ventana 0
+              TAb(2:C(idxc))=teta(idxt)*HV(2:C(idxc));%Tasa promedio de abandono de la ventana 1 a C
+              ttran=Pw*HV(2:C(idxc));%Tasa promedio de producción de la ventana 2 a la ventana C
               
-              Si=HV(C(idxc)+1);
+              Si=HV(C(idxc)+1);%Población de la ventana C+1 
+              %En caso que sea mayor a 2 puede ocurrir un abandono o una
+              %transferencia a la ventana inferior. 
               if Si >= 2
-                 TAb(C(idxc)+1)=teta(idxt)*(Si-1);
-                 ttran(C(idxc)+1)=Pw*HV(C(idxc)+1);
+                 TAb(C(idxc)+1)=teta(idxt)*(Si-1);%Tasa de abandono de la ventana C+1
+                 ttran(C(idxc)+1)=Pw*HV(C(idxc)+1);%Tasa de producción de la ventana C+1
               else
                  TAb(C(idxc)+1)=inf;
                  ttran(C(idxc)+1)=inf;
               end
               
-              %Tranferencia para usuarios en ventanas 0 a N-1        
+              %Tranferencia para usuarios en ventanas 0 a C-1        
               tao_cw=cw*HV(1:C(idxc));%Tasa promedio de descarga en abundancia
 
               for i=1:C(idxc)
