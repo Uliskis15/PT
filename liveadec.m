@@ -26,6 +26,7 @@ for idxc=1:length(C)
       tp=0;%Vector de tiempos promedio por ventana
       TAb=zeros(1,C(idxc)+1);%Vector para tasa de abandono
       tab=zeros(1,C(idxc)+1);%Vector para tasa de abandono
+      tao_cw=zeros(1,C(idxc));%Vector para tasa de descarga
       tao_mw=zeros(1,C(idxc));%Vector para tasa de subida
       ttran=zeros(1,C(idxc));%Vector para tasa de producción
       TProd=zeros(1,C(idxc));%Vector para tasa de transferencia inferior
@@ -57,8 +58,10 @@ for idxc=1:length(C)
                  ttran(C(idxc)+1)=inf;
               end
               
-              %Tranferencia para usuarios en ventanas 0 a C-1        
-              tao_cw=cw*HV(1:C(idxc));%Tasa promedio de descarga en abundancia
+              %Tranferencia para usuarios en ventanas 0 a C-1
+              tao_cw(1)=cw*HV(1);%Tasa promedio de descarga en abundancia
+              tao_cw(2:C(idxc))=(cw-Pw)*HV(2:C(idxc));%Tasa promedio de descarga en abundancia
+              
 
               for i=1:C(idxc)
                   for k=i+1:C(idxc)
@@ -73,9 +76,9 @@ for idxc=1:length(C)
               tao_min=min(tao_cw,tao_mw);%Tasa promedio de descarga en la ventana i
 
               VEArr=exprnd(TArr);%V.A para arribos
-              ab=exprnd(1./TAb);%Vector de V.As para abandonos
+              ab=exprnd(1./TAb);%Vector de V.A para abandonos
               prod=exprnd(1./ttran);%Vector de V.A para tranferencias inferiores
-              tran=exprnd(1./tao_min);%Vector de V.As para transferencias superiores
+              tran=exprnd(1./tao_min);%Vector de V.A para transferencias superiores
 
               %Tiempos infinitos para descartar un abandono o transferencia
               %inválido             
