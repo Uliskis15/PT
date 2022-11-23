@@ -26,7 +26,7 @@ for idxc=1:length(C)
       tp=0;%Vector de tiempos promedio por ventana
       TAb=zeros(1,C(idxc)+1);%Vector para tasa de abandono
       tab=zeros(1,C(idxc)+1);%Vector para tasa de abandono
-      tao_cw=zeros(1,C(idxc));%Vector para tasa de subida
+      tao_cw=zeros(1,C(idxc));%Vector para tasa de descarga
       tao_mw=zeros(1,C(idxc));%Vector para tasa de subida
       ttran=zeros(1,C(idxc));%Vector para tasa de producción
       TProd=zeros(1,C(idxc));%Vector para tasa de transferencia inferior
@@ -59,7 +59,8 @@ for idxc=1:length(C)
               end
               
               %Tranferencia para usuarios en ventanas 0 a C-1
-              tao_cw=(cw-Pw)*HV(1:C(idxc));%Tasa promedio de descarga en abundancia
+              tao_cw(1)=cw*HV(1);%Tasa promedio de descarga en abundancia
+              tao_cw(2:C(idxc))=(cw-Pw)*HV(2:C(idxc));%Tasa promedio de descarga en abundancia
               
 
               for i=1:C(idxc)
@@ -156,7 +157,7 @@ surf(C,teta,transpose(X_prom),'FaceAlpha',0.5)
 xticks([12:4:36])
 yticks([0.002:0.001:0.01])
 %zticks([0:2:12])
-%zlim([0 12])
+zlim([0 20])
 ylabel('\theta')
 xlabel('C')
 zlabel('x')
