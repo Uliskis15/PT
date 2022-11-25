@@ -10,7 +10,7 @@ c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
 teta0=3*(10^-3);%Tasa de abandono para usuarios en ventana 0
 X_prom=zeros(length(lmb),C+1);%Matriz de downloaders promedio
-IT=100000;%Número de iteraciones
+IT=1000000;%Número de iteraciones
 
 cw=C*c;%Tasa de descarga máxima
 mw=C*mu;%Tasa de subida máxima

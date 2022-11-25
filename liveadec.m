@@ -8,8 +8,8 @@ teta=[2 4 6 8 10].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
-P=0.00245;%Tasa de producción del video
-teta0=0.006;%Tasa de abandono para usuarios en ventana 0
+%P=0.00245;%Tasa de producción del video
+teta0=3*(10^-3);%Tasa de abandono para usuarios en ventana 0
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 IT=100000;%Número de iteraciones
 
@@ -19,7 +19,7 @@ for idxc=1:length(C)
             
       cw=C(idxc)*c;%Tasa de descarga máxima
       mw=C(idxc)*mu;%Tasa de subida máxima
-      Pw=C(idxc)*P;%Tasa de producción del video
+      Pw=0.5*cw;%Tasa de producción del video
       HV=zeros(1,C(idxc)+1);%Vector de poblaciones por ventana de la hiperventana
       HV(C(idxc)+1)=1;%Estado Inicial (0,0,0,0,...,1)
       xi_prom=0;%Cadena acumulativa para obtener el promedio por iteración
