@@ -11,7 +11,7 @@ mu=0.00255;%Tasa de subida general
 %P=0.00245;%Tasa de producción del video
 teta0=[5 6 7 8 9 ].*(10^-3);%Tasa de abandono para usuarios en ventana 0
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
-IT=50;%Número de iteraciones
+IT=50000;%Número de iteraciones
 
 for idxc=1:length(C)
         
@@ -156,9 +156,9 @@ figure(1)
 surf(C,teta0,transpose(X_prom),'FaceAlpha',0.25)
 xticks([12:4:36])
 yticks([0.002:0.001:0.01])
-zticks([0:2:20])
-zlim([0 20])
-ylabel('\theta0')
+zticks([0:2:6])
+zlim([0 6])
+ylabel('\theta_0')
 xlabel('C')
 zlabel('x')
 title('Número de downloaders en equilibrio')
