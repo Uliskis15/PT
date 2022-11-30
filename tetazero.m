@@ -9,7 +9,7 @@ lmb=0.04;%Tasa de arribos
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
 %P=0.00245;%Tasa de producción del video
-teta0=[5 6 7 8 9 ].*(10^-3)*(10^-3);%Tasa de abandono para usuarios en ventana 0
+teta0=[5 6 7 8 9 ].*(10^-3);%Tasa de abandono para usuarios en ventana 0
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 IT=50;%Número de iteraciones
 
