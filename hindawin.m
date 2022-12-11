@@ -50,7 +50,7 @@ for idxn=1:length(N)
                  TAb(N(idxn)+1)=inf;
               end
 
-              %Tranferencia para usuarios en ventanas 0 a N-2        
+              %Tranferencia para usuarios en ventanas 0 a N-1        
               tao_cw=cw*W(1:N(idxn));%Tasa promedio de descarga en abundancia
 
               for i=1:N(idxn)-1
