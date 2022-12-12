@@ -12,7 +12,7 @@ ms=1.24;%Tasa de subida CDN
 %P=0.00245;%Tasa de producción del video
 teta0=3*(10^-3);%Tasa de abandono para usuarios en ventana 0
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
-IT=50000;%Número de iteraciones
+IT=100000;%Número de iteraciones
 
 for idxc=1:length(C)
         

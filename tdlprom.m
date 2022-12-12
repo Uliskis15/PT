@@ -14,7 +14,7 @@ teta0=3*(10^-3);%Tasa de abandono para usuarios en ventana 0
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 Tdl0=zeros(1,length(C));
 Tdl=zeros(length(C),length(teta));
-IT=50000;%Número de iteraciones
+IT=100000;%Número de iteraciones
 
 for idxc=1:length(C)
         

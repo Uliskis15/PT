@@ -12,7 +12,7 @@ mu=0.00255;%Tasa de subida general
 teta0=3*(10^-3);%Tasa de abandono para usuarios en ventana 0
 X_prom=zeros(1,length(C));%Matriz de downloaders promedio
 BwidthD=zeros(1,length(C));%Matriz de ancho de banda demandado
-IT=50000;%Número de iteraciones
+IT=100000;%Número de iteraciones
 
 for idxc=1:length(C)
             
