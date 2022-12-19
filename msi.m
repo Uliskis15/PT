@@ -30,7 +30,7 @@ tao_cw=zeros(1,C+1);%Vector para tasa de descarga
 tao_mw=zeros(1,C+1);%Vector para tasa de subida
 ttran=zeros(1,C);%Vector para tasa de producción
 TProd=zeros(1,C);%Vector para tasa de transferencia inferior
-TTran=zeros(1,C);%Vector para tasa de transferencia superior
+TTran=zeros(1,C+1);%Vector para tasa de transferencia superior
 DN=0;            
 for iter=1:IT
     den=0;      
@@ -118,7 +118,7 @@ for iter=1:IT
     end
     VEPw=min(TProd);% Obtener minimo de prod
 
-    for idxtao=1:C%Cambir el vector a infinitos para descartar poblaciones en 0
+    for idxtao=1:C+1%Cambir el vector a infinitos para descartar poblaciones en 0
         if(tran(idxtao)==0)
            TTran(idxtao)=inf;
         else
@@ -158,7 +158,7 @@ for iter=1:IT
            R=Pw*HV(idx)-VETao;
            tr=max(0,R);
            if tr==0
-              HV(idx)=HV(idx1)-1;%Decrementar W en idx
+              HV(idx)=HV(idx)-1;%Decrementar W en idx
               HV(idx-1)=HV(idx-1)+1;%Incrementar W en idx-1
               tp=tp+R;%Se suma el tiempo promedio a tp en idx
            else
