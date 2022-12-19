@@ -156,15 +156,9 @@ for iter=1:IT
         idx=find(tran==VETao);%Encontrar indice donde ab == VEAb
         if idx==C+1
            R=Pw*HV(idx)-VETao;
-           tr=max(0,R);
-           if tr==0
-              HV(idx)=HV(idx1)-1;%Decrementar W en idx
-              HV(idx-1)=HV(idx-1)+1;%Incrementar W en idx-1
-              tp=tp+R;%Se suma el tiempo promedio a tp en idx
-           else
-              HV(idx)=HV(idx);%Mantener W igual en idx 
-              tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
-           end
+           tr=m
+           HV(idx)=HV(idx);%Mantener W igual en idx 
+           tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
         else
            HV(idx)=HV(idx)-1;%Decrementar W en idx
            HV(idx+1)=HV(idx+1)+1;%Incrementar W en idx+1
