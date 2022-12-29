@@ -155,9 +155,9 @@ for idxc=1:length(C)
 end
      
 figure(1)
-plot(0:1:24,BwidthD,'-o')
-xticks([0:1:24])
-%yticks([0:max(BwidthD)])
+plot(0:1:C(length(C)),BwidthD,'-o')
+xticks([0:1:C])
+yticks([0:max(BwidthD)])
 xlabel('C')
 ylabel('Ventanas/segundo')
 title('Ancho de banda consumido en el sistema')

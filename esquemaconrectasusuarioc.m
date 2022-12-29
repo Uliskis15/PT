@@ -8,12 +8,13 @@ teta=6*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
-ms=1.24;%Tasa de subida CDN
+ms=2.48;%Tasa de subida CDN
+a=6;%Limite en y de las rectas
 %P=0.00245;%Tasa de producción del video
 teta0=3*(10^-3);%Tasa de abandono para usuarios en ventana 0
 X_prom=zeros(1,C+1);%Matriz de downloaders promedio
 BwidthD=zeros(1,C+1);%Matriz de ancho de banda demandado
-IT=50;%Número de iteraciones
+IT=100000;%Número de iteraciones
 ms_i=zeros(1,C+1);%Vector para ms por ventana
 MS_F=zeros(1,C+1);%Vector para ms por ventana
 PT=zeros(1,C+1);%Vector para ms por ventana
@@ -31,6 +32,7 @@ tao_mw=zeros(1,C+1);%Vector para tasa de subida
 ttran=zeros(1,C);%Vector para tasa de producción
 TProd=zeros(1,C);%Vector para tasa de transferencia inferior
 TTran=zeros(1,C+1);%Vector para tasa de transferencia superior
+rec=zeros(1,C+1);%Vector para almacenar las rectas
 DN=0;            
 for iter=1:IT
     den=0;      
@@ -52,34 +54,31 @@ for iter=1:IT
     %transferencia a la ventana inferior. 
     if Si >= 2
        TAb(C+1)=teta*(Si-1);%Tasa de abandono de la ventana C+1
-       ttran(C+1)=Pw*HV(C+1);%Tasa de producción de la ventana C+1
     else
        TAb(C+1)=inf;
-       ttran(C+1)=inf;
     end
               
     %Tranferencia para usuarios en ventanas 0 a C-1
     tao_cw(1)=cw*HV(1);%Tasa promedio de descarga en abundancia
     tao_cw(2:C+1)=(cw-Pw)*HV(2:C+1);%Tasa promedio de descarga en abundancia
+    
+    %Obtener rectas para escalar msi
+    kv=C/2;%Ventana de enmedio
+    m1=-a/kv;
+    m2=a/kv;
+    for i=1:C+1
+        if i<=kv
+            rec(i)=((i-1)*m1)+a;
+        elseif i==kv+1
+            rec(i)=0;
+        else
+            rec(i)=((i-1)-kv)*m2;
+        end
+        den=den+HV(i)*rec(i);
+    end
               
     for i=1:C+1
-        k=C/2;
-        if i<=k
-           den=den+HV(i)*(-i);
-        else
-           den=den+HV(i)*(i);
-        end
-     end
-
-     for i=1:C+1
-         k=C/2;
-         if i<=k
-            ms_i(i)=ms*HV(i)*(-i)/den;
-         elseif i==k+1
-            ms_i(i)=0;
-         else
-            ms_i(i)=ms*HV(i)*(i)/den;
-         end
+        ms_i(i)=ms*HV(i)*rec(i)/den;
      end
               
      for i=1:C+1
@@ -92,7 +91,21 @@ for iter=1:IT
     %Obtener V.A con las tasas de arribo, abandono,
     %producción(tranferencia inferior) y transferencia superior
     tao_min=min(tao_cw,TAO_MW);%Tasa promedio de descarga en la ventana i
-
+    
+    res=(Pw*HV(C+1))-tao_min(C+1);
+    desc=max(0,res);
+    if Si >= 2
+       if desc>0
+           ttran(C)=desc;%Tasa de producción de la ventana C+1
+       else
+           ttran(C)=inf;
+           tao_min(C+1)=inf;
+       end
+    else
+       ttran(C)=inf;
+       tao_min(C+1)=inf;
+    end
+    
     VEArr=exprnd(TArr);%V.A para arribos
     ab=exprnd(1./TAb);%Vector de V.A para abandonos
     prod=exprnd(1./ttran);%Vector de V.A para tranferencias inferiores
@@ -154,66 +167,16 @@ for iter=1:IT
 
     elseif Evfinal==VETao
         idx=find(tran==VETao);%Encontrar indice donde ab == VEAb
-        if idx==C+1
-           R=Pw*HV(idx)-VETao;
-           tr=max(0,R);
-           if tr==0
-              HV(idx)=HV(idx)-1;%Decrementar W en idx
-              HV(idx-1)=HV(idx-1)+1;%Incrementar W en idx-1
-              tp=tp+R;%Se suma el tiempo promedio a tp en idx
-           else
-              HV(idx)=HV(idx);%Mantener W igual en idx 
-              tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
-           end
-        else
-           HV(idx)=HV(idx)-1;%Decrementar W en idx
-           HV(idx+1)=HV(idx+1)+1;%Incrementar W en idx+1
-           tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
-        end
+        HV(idx)=HV(idx)-1;%Decrementar W en idx
+        HV(idx+1)=HV(idx+1)+1;%Incrementar W en idx+1
+        tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
     end 
         %xi_prom=xi_prom+(sum(HV(1:C+1))*Evfinal);                
     end
-          %HV
-        %x_prom=xi_prom/tp;  
-        PT=PT+HV;
+    
+    PT=PT+HV;
 end
-
-for i=1:C+1
-    k=C/2;
-    if i<=k
-       DN=DN+PT(i)*(-i);
-    else
-       DN=DN+PT(i)*(i);
-    end
-end
-
-for i=1:C+1
-    k=C/2;
-    if i<=k
-    MS_F(i)=ms*PT(i)*(-i)/DN;
-    elseif i==k+1
-    MS_F(i)=0;
-    else
-    MS_F(i)=ms*PT(i)*(i)/DN;
-    end
-end
+HV
+PT
+%plot(0:1:C,PT/tp)
    
-figure(1)
-plot(0:C,abs(ms_i),'-o')
-xticks([0:2:C])
-% yticks([0.002:0.001:0.01])
-% zticks([0:2:20])
-% zlim([0 20])
-xlabel('C')
-ylabel('x')
-title('Número de downloaders en equilibrio')
-
-figure(2)
-plot(0:C,abs(MS_F),'-o')
-xticks([0:2:C])
-% yticks([0.002:0.001:0.01])
-% zticks([0:2:20])
-% zlim([0 20])
-xlabel('C')
-ylabel('x')
-title('Número de downloaders en equilibrio')
