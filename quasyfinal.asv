@@ -48,14 +48,14 @@ for idxc=1:length(C)
              %Generar tasas de arribo, abandono y transferencia a la ventana inferior por ventana
              TArr=1/lmb;%Tasa promedio de arribo a la ventana 0
              TAb(1)=teta0*HV(1);%Tasa promedio de abandono de la ventana 0
-             TAb(2:C(idxc))=teta(idxt)*HV(2:C(idxc));%Tasa promedio de abandono de la ventana 1 a C
-             ttran=Pw*HV(2:C(idxc));%Tasa promedio de producción de la ventana 2 a la ventana C
+             TAb(2:C(idxc))=teta*HV(2:C(idxc));%Tasa promedio de abandono de la ventana 1 a C
+             ttran=Pw*HV(2:C(idcx));%Tasa promedio de producción de la ventana 2 a la ventana C
               
              Si=HV(C(idxc)+1);%Población de la ventana C+1 
              %En caso que sea mayor a 2 puede ocurrir un abandono o una
              %transferencia a la ventana inferior. 
              if Si >= 2
-                TAb(C(idxc)+1)=teta(idxt)*(Si-1);%Tasa de abandono de la ventana C+1
+                TAb(C(idxc)+1)=teta*(Si-1);%Tasa de abandono de la ventana C+1
              else
                 TAb(C(idxc)+1)=inf;
              end
@@ -87,25 +87,25 @@ for idxc=1:length(C)
                  for k=i+1:C(idxc)
                      tao_mw(i)=tao_mw(i)+(mw*HV(i)*(HV(k)/sum(HV(1:k-1))));%Tasa promedio de descarga en penuria
                  end
-                 tao_mw(i)=tao_mw(i)+(HV(C(idxc)+1)/sum(HV(1:C(idxc))));
+                 tao_mw(i)=tao_mw(i)+(HV(C(idxc)+1)/sum(HV(1:C(idxx))));
              end
              TAO_MW=tao_mw+ms_i;          
              %Obtener V.A con las tasas de arribo, abandono,
              %producción(tranferencia inferior) y transferencia superior
              tao_min=min(tao_cw,TAO_MW);%Tasa promedio de descarga en la ventana i
     
-             res=(Pw*HV(C(idxc)+1))-tao_min(C(idxc)+1);
+             res=(Pw*HV(C+1))-tao_min(C+1);
              desc=max(0,res);
              if Si >= 2
                 if desc>0
-                   ttran(C(idxc))=desc;%Tasa de producción de la ventana C+1
+                   ttran(C)=desc;%Tasa de producción de la ventana C+1
                 else
-                   ttran(C(idxc))=inf;
-                   tao_min(C(idxc)+1)=inf;
+                   ttran(C)=inf;
+                   tao_min(C+1)=inf;
                 end
              else
-                ttran(C(idxc))=inf;
-                tao_min(C(idxc)+1)=inf;
+                ttran(C)=inf;
+                tao_min(C+1)=inf;
              end
     
              VEArr=exprnd(TArr);%V.A para arribos
@@ -115,7 +115,7 @@ for idxc=1:length(C)
 
              %Tiempos infinitos para descartar un abandono o transferencia
              %inválido             
-             for idxab=1:C(idxc)+1%Cambir el vector a infinitos para descartar poblaciones en 0
+             for idxab=1:C+1%Cambir el vector a infinitos para descartar poblaciones en 0
                  if(ab(idxab)==0)
                     tab(idxab)=inf;
                  else
@@ -124,7 +124,7 @@ for idxc=1:length(C)
              end
              VEAb=min(tab);% Obtener minimo de ab
               
-             for idxpw=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
+             for idxpw=1:C%Cambir el vector a infinitos para descartar poblaciones en 0
                  if(prod(idxpw)==0)
                     TProd(idxpw)=inf;
                  else
@@ -133,7 +133,7 @@ for idxc=1:length(C)
              end
              VEPw=min(TProd);% Obtener minimo de prod
 
-             for idxtao=1:C(idxc)+1%Cambir el vector a infinitos para descartar poblaciones en 0
+             for idxtao=1:C+1%Cambir el vector a infinitos para descartar poblaciones en 0
                  if(tran(idxtao)==0)
                     TTran(idxtao)=inf;
                  else
@@ -173,9 +173,8 @@ for idxc=1:length(C)
                 HV(idx+1)=HV(idx+1)+1;%Incrementar W en idx+1
                 tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
              end 
-             xi_prom=xi_prom+(sum(HV(1:C(idxc)+1))*Evfinal);                
+          %xi_prom=xi_prom+(sum(HV(1:C+1))*Evfinal);                
           end
-         x_prom=xi_prom/tp;
       end
          %Obtener los promedios de seeds y downloaders para distintos
          %valores  de N y teta 
