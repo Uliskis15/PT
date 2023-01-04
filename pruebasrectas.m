@@ -2,7 +2,7 @@ clear all
 close all
 
 x=48;
-a=5;
+a=0.1;
 k=x/2;
 m1=-a/k;
 m2=a/k;
