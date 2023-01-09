@@ -204,7 +204,7 @@ ylabel('Ventanas/segundo')
 title('Ancho de banda consumido en el sistema')
 
 figure(2)
-plot(0:C,MS_I/tp,'-o')
+plot(0:C,abs(MS_F),'-o')
 xticks([0:2:C])
 % yticks([0.002:0.001:0.01])
 % zticks([0:2:20])

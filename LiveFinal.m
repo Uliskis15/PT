@@ -3,8 +3,8 @@ close all
 
 %Declaración de Variables
 
-C=[28];% Número de ventanas
-teta=[6].*(10^-3);%Tasa de abandono general
+C=[36 32 28 24 20 16 12];% Número de ventanas
+teta=[2 4 6 8 10].*(10^-3).*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
@@ -187,28 +187,14 @@ for idxc=1:length(C)
          %disp('------');
    end        
 end
-BwidthD=(PT*cw)/tp;
-     
-% figure(1)
-% surf(C,teta,transpose(X_prom),'FaceAlpha',0.75)
-% xticks([12:4:36])
-% yticks([0.002:0.001:0.01])
-% zticks([0:2:max(max(X_prom))+1])
-% zlim([0 max(max(X_prom))+1])
-% ylabel('\theta')
 figure(1)
-plot(0:1:C,BwidthD,'-o')
-xticks([0:1:C])
+surf(C,teta,transpose(X_prom),'FaceAlpha',0.25)
+xticks([12:4:36])
+%yticks([0.002:0.001:0.01])
+%zticks([0:2:22])
+%zlim([0 28])
+ylabel('\theta')
 xlabel('C')
-ylabel('Ventanas/segundo')
-title('Ancho de banda consumido en el sistema')
-
-figure(2)
-plot(0:C,MS_I/tp,'-o')
-xticks([0:2:C])
-% yticks([0.002:0.001:0.01])
-% zticks([0:2:20])
-% zlim([0 20])
-xlabel('C')
-ylabel('ventanas\segundo')
-title('Ancho de banda de servidores')
+zlabel('x')
+title('Número de downloaders en equilibrio')
+     
