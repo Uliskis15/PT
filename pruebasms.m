@@ -36,6 +36,7 @@ for idxc=1:length(C)
       TTran=zeros(1,C(idxc)+1);%Vector para tasa de transferencia superior
       ms_i=zeros(1,C(idxc)+1);%Vector para ms por ventana
       MS_I=zeros(1,C(idxc)+1);%Vector para ms por ventana
+      BwidthD=zeros(1,C(idxc)+1);%Vector para ms por ventana
       rec=zeros(1,C(idxc)+1);%Vector para almacenar las rectas
             
       for iter=1:IT
@@ -95,6 +96,7 @@ for idxc=1:length(C)
              %Obtener V.A con las tasas de arribo, abandono,
              %producción(tranferencia inferior) y transferencia superior
              tao_min=min(tao_cw,TAO_MW);%Tasa promedio de descarga en la ventana i
+             BwidthD=BwidthD+(cw*HV);
     
              res=(Pw*HV(C(idxc)+1))-tao_min(C(idxc)+1);
              desc=max(0,res);
@@ -178,8 +180,9 @@ for idxc=1:length(C)
              xi_prom=xi_prom+(sum(HV(1:C(idxc)+1))*Evfinal);                
           end
          x_prom=xi_prom/tp;
-         PT=PT+HV;
-         MS_I=MS_I+ms_i;
+         
+         
+         %MS_I=MS_I+ms_i;
       end
          %Obtener los promedios de seeds y downloaders para distintos
          %valores  de N y teta 
@@ -187,7 +190,7 @@ for idxc=1:length(C)
          %disp('------');
    end        
 end
-BwidthD=(PT*cw)/tp;
+%BwidthD=(PT*cw)/tp;
      
 % figure(1)
 % surf(C,teta,transpose(X_prom),'FaceAlpha',0.75)
@@ -203,12 +206,12 @@ xlabel('C')
 ylabel('Ventanas/segundo')
 title('Ancho de banda consumido en el sistema')
 
-figure(2)
-plot(0:C,MS_I/tp,'-o')
-xticks([0:2:C])
-% yticks([0.002:0.001:0.01])
-% zticks([0:2:20])
-% zlim([0 20])
-xlabel('C')
-ylabel('ventanas\segundo')
-title('Ancho de banda de servidores')
+% figure(2)
+% plot(0:C,MS_I/tp,'-o')
+% xticks([0:2:C])
+% % yticks([0.002:0.001:0.01])
+% % zticks([0:2:20])
+% % zlim([0 20])
+% xlabel('C')
+% ylabel('ventanas\segundo')
+% title('Ancho de banda de servidores')
