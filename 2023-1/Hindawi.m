@@ -3,7 +3,7 @@ close all
 
 %Declaración de Variables
 
-N=20;%Número de ventanas 
+N=48;%Número de ventanas 
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu= 0.00255;%Tasa de subida general
@@ -20,7 +20,7 @@ TAb=zeros(1,N+1);%Vector para tasa de abandono
 tao_mw=zeros(1,N);%Vector para tasa de abandono
 
 %Comienza el ciclo repetitivo
-for iter=1:500
+for iter=1:50000
     
     %Caso estado (0,0,0,....,1)
     if W(1:N)==0%Arribo porque las poblaciones de 0 a N son 0 
@@ -108,7 +108,7 @@ for iter=1:500
            W(idx+1)=W(idx+1)+1;%Incrementar W en idx+1
            tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
         end 
-        w_prom=w_prom+(sum(W(1:N))*Evfinal);
+        w_prom=w_prom+(W(1:N)*Evfinal);
         y_prom=y_prom+(W(N+1)*Evfinal);
     end 
     W;

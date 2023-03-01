@@ -3,7 +3,7 @@ close all
 
 %Declaración de Variables
 
-N=[96];% Número de ventanas
+N=[24];% Número de ventanas
 teta=[2]*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
@@ -114,8 +114,8 @@ for idxn=1:length(N)
                 W(idx+1)=W(idx+1)+1;%Incrementar W en idx+1
                 tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
              end 
-                wi_prom=wi_prom+(W(1:N(idxn)+1)*Evfinal);
-                yi_prom=yi_prom+(W(N(idxn)+1)*Evfinal);
+                wi_prom=wi_prom+(W(1:N(idxn))*Evfinal);
+                yi_prom=yi_prom+(W(N(idxn))*Evfinal);
           end
             w_prom=wi_prom./tp;
             y_prom=yi_prom/tp;  
@@ -130,10 +130,10 @@ for idxn=1:length(N)
    end        
 end
      
-figure(1)
-plot(0:N,w_prom,'b','LineWidth',0.5)
-xticks([0:N/12:N])
-ylim([0 max(w_prom)+0.2])
+% figure(1)
+% plot(0:N,w_prom,'b','LineWidth',0.5)
+% xticks([0:N/12:N])
+% ylim([0 max(w_prom)+0.2])
 % surf(N,teta,transpose(X_prom),'FaceAlpha',0.5)
 % xticks([24:12:96])
 % yticks([0.002:0.001:0.01])
