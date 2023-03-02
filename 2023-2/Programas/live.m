@@ -53,7 +53,7 @@ for idxc=1:length(C)
              tao_cw(1:C(idxc))=cw*HV(1:C(idxc));%Tasa promedio de descarga en abundancia
                    
              for i=1:C(idxc)
-                 for k=i+1:C(idxc)+1
+                 for k=i+1:C(idxc)
                      tao_mw(i)=tao_mw(i)+(mw*HV(i)*(HV(k)/sum(HV(1:k-1))));%Tasa promedio de descarga en penuria
                  end
                  tao_mw(i)=tao_mw(i)+ms*(HV(i)/sum(HV));
@@ -146,6 +146,9 @@ figure(1)
 plot(0:C,x_prom,'b-*','LineWidth',0.5)
 xticks([0:C])
 ylim([0 max(x_prom)+0.2])
+xlabel('C')
+ylabel('Dounloaders')
+title('Número de downloader promedio')
 
 figure(2)
 plot(BW,'b-*','LineWidth',0.5)
@@ -153,6 +156,11 @@ hold on
 plot(BWP2P,'r--','LineWidth',0.5)
 plot(BWSer,'m','LineWidth',0.5)
 hold off
+legend('C_\omega*X_i','BWP2P','BWServ')
+xlabel('C')
+ylabel('Ventanas/segundo')
+title('Anchos de banda del Sistema')
+
 
 
 

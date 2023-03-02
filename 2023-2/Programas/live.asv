@@ -53,7 +53,7 @@ for idxc=1:length(C)
              tao_cw(1:C(idxc))=cw*HV(1:C(idxc));%Tasa promedio de descarga en abundancia
                    
              for i=1:C(idxc)
-                 for k=i+1:C(idxc)+1
+                 for k=i+1:C(idxc)
                      tao_mw(i)=tao_mw(i)+(mw*HV(i)*(HV(k)/sum(HV(1:k-1))));%Tasa promedio de descarga en penuria
                  end
                  tao_mw(i)=tao_mw(i)+ms*(HV(i)/sum(HV));
@@ -82,7 +82,7 @@ for idxc=1:length(C)
               
              for idxpw=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
                  if(prod(idxpw)==0)
-                    TProd(idxpw)=inf;
+                    TProd(idxpw)=1000000;
                  else
                     TProd(idxpw)=prod(idxpw);
                  end
@@ -91,7 +91,7 @@ for idxc=1:length(C)
 
              for idxtao=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
                  if(tran(idxtao)==0)
-                    TTran(idxtao)=inf;
+                    TTran(idxtao)=1000000;
                  else
                     TTran(idxtao)=tran(idxtao);
                  end
@@ -134,7 +134,7 @@ for idxc=1:length(C)
       end 
       x_prom=xi_prom/tp;
       BW=cw*x_prom;
-      BWP2P=min(cw*x_prom(1:C(idxc)),tao_min);
+      BWP2P=min(cw*x_prom(1:C(idxc)),TTran);
       BWSer=(cw*x_prom(1:C(idxc))-BWP2P);
          %Obtener los promedios de seeds y downloaders para distintos
          %valores  de N y teta 
@@ -146,6 +146,9 @@ figure(1)
 plot(0:C,x_prom,'b-*','LineWidth',0.5)
 xticks([0:C])
 ylim([0 max(x_prom)+0.2])
+xlabel('C')
+ylabel('Dounloaders')
+title('Número de downloader promedio')
 
 figure(2)
 plot(BW,'b-*','LineWidth',0.5)
@@ -153,6 +156,11 @@ hold on
 plot(BWP2P,'r--','LineWidth',0.5)
 plot(BWSer,'m','LineWidth',0.5)
 hold off
+legend('C_\omega*X_i','BWP2P','BWServ')
+xlabel('C')
+ylabel('Ventanas/segundo')
+title('Anchos de banda del Sistema')
+
 
 
 
