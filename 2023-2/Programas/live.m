@@ -8,7 +8,7 @@ teta=[2].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
-ms=1000000;%Tasa de subida CDN
+ms=0.5;%Tasa de subida CDN
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 IT=100000;%Número de iteraciones
 
@@ -23,19 +23,22 @@ for idxc=1:length(C)
       HV=zeros(1,C(idxc)+1);%Vector de poblaciones por ventana de la hiperventana
       xi_prom=0;%Cadena acumulativa para obtener el promedio por iteración
       x_prom=0;%Cadena acumulativa para obtener el promedio por iteración
-      BW=0;%Cadena acumulativa para obtener el promedio por iteración
-      BWP2P=0;%Cadena acumulativa para obtener el promedio por iteración
-      BWSer=0;%Cadena acumulativa para obtener el promedio por iteración
+      BW=zeros(1,C(idxc));%Cadena acumulativa para obtener el promedio por iteración
+      BWP2P=zeros(1,C(idxc));%Cadena acumulativa para obtener el promedio por iteración
+      BWSer=zeros(1,C(idxc));%Cadena acumulativa para obtener el promedio por iteración
       tp=0;%Vector de tiempos promedio por ventana
       TAb=zeros(1,C(idxc)+1);%Vector para tasa de abandono
       tab=zeros(1,C(idxc)+1);%Vector para tasa de abandono
       tao_cw=zeros(1,C(idxc));%Vector para tasa de descarga
-      tao_mw=zeros(1,C(idxc));%Vector para tasa de subida
       ttran=zeros(1,C(idxc));%Vector para tasa de producción
       TProd=zeros(1,C(idxc));%Vector para tasa de transferencia inferior
       TTran=zeros(1,C(idxc));%Vector para tasa de transferencia superior
+      conbw=0;
+      cnt=0;
             
-      for iter=1:IT      
+      for iter=1:IT   
+          tao_mw=zeros(1,C(idxc));%Vector para tasa de subida
+          tao_serv=zeros(1,C(idxc));%Vector para tasa de descarga
           %Caso estado (0,0,0,....,0)
           if HV(1:C(idxc))==0%Arribo porque las poblaciones de 0 a C+1 son 0 
              HV(1)=HV(1)+1;
@@ -53,13 +56,26 @@ for idxc=1:length(C)
              tao_cw(1:C(idxc))=cw*HV(1:C(idxc));%Tasa promedio de descarga en abundancia
                    
              for i=1:C(idxc)
-                 for k=i+1:C(idxc)
-                     tao_mw(i)=tao_mw(i)+(mw*HV(i)*(HV(k)/sum(HV(1:k-1))));%Tasa promedio de descarga en penuria
-                 end
-                 tao_mw(i)=tao_mw(i)+ms*(HV(i)/sum(HV));
+                 if HV(i)==0
+                     tao_mw(i)=1000000;
+                 else
+                     for k=i+1:C(idxc)+1
+                         tao_mw(i)=tao_mw(i)+(mw*HV(i)*(HV(k)/sum(HV(1:k-1))));%Tasa promedio de descarga en penuria
+                     end
+                     tao_mw(i)=tao_mw(i);
+                 end           
              end
              
-             tao_min=min(tao_cw,tao_mw);%Tasa promedio de descarga en la ventana i
+             for i=1:C(idxc)
+                 if HV(i)==0
+                     tao_serv(i)=1000000;
+                 else
+                     tao_serv(i)=tao_serv(i)+ms*(HV(i)/sum(HV));
+                 end           
+             end
+             TAO_MW=tao_mw+tao_serv;
+             
+             tao_min=min(tao_cw,TAO_MW);%Tasa promedio de descarga en la ventana i
          
              %Obtener V.A con las tasas de arribo, abandono,
              %producción(tranferencia inferior) y transferencia superior            
@@ -128,30 +144,38 @@ for idxc=1:length(C)
                 HV(idx)=HV(idx)-1;%Decrementar W en idx
                 HV(idx+1)=HV(idx+1)+1;%Incrementar W en idx+1
                 tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
+                BW=BW+(cw*(HV(1:C(idxc))/tp));
+                bdwith=BW;
+                for ind=1:C(idxc)
+                    if tao_cw(ind)>TAO_MW(ind)
+                       BWP2P(ind)=BWP2P(ind)+(tao_mw(ind)/tp);
+                       BWSer(ind)=BWSer(ind)+(tao_serv(ind)/tp);
+                    else
+                       BWP2P(ind)=BWP2P(ind)+(min(tao_cw(ind),tao_mw(ind))/tp);
+                       BWSer(ind)=BWSer(ind)+((bdwith(ind)-BWP2P(ind))/tp);
+                    end
+                end
              end
              xi_prom=xi_prom+(HV(1:C(idxc)+1)*Evfinal); 
           end          
       end 
       x_prom=xi_prom/tp;
-      BW=cw*x_prom;
-      BWP2P=min(cw*x_prom(1:C(idxc)),TTran);
-      BWSer=(cw*x_prom(1:C(idxc))-BWP2P);
+     
          %Obtener los promedios de seeds y downloaders para distintos
          %valores  de N y teta 
 %          X_prom(idxc,idxt)=x_prom;
-         %disp('------');
+
    end        
 end
 figure(1)
 plot(0:C,x_prom,'b-*','LineWidth',0.5)
-xticks([0:C])
 ylim([0 max(x_prom)+0.2])
 xlabel('C')
 ylabel('Dounloaders')
 title('Número de downloader promedio')
 
 figure(2)
-plot(BW,'b-*','LineWidth',0.5)
+plot(0:C-1,BW,'b-*','LineWidth',0.5)
 hold on
 plot(BWP2P,'r--','LineWidth',0.5)
 plot(BWSer,'m','LineWidth',0.5)
