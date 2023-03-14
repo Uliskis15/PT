@@ -149,15 +149,15 @@ for idxc=1:length(C)
                     HV(idx+1)=HV(idx+1)+1;%Incrementar W en idx+1
                     tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
                     tiempotran=tiempotran+VETao;
-                    BW(idxms,:)=BW(idxms,:)+((tao_cw*VETao)/tiempotran);
+                    BW(idxms,:)=BW(idxms,:)+(tao_cw*VETao);
                     for ind=1:C(idxc)
                         if tao_cw(ind)>TAO_MW(ind)
-                           BWP2P(idxms,ind)=BWP2P(idxms,ind)+(tao_mw(ind)*VETao/tiempotran);
-                           BWSer(idxms,ind)=BWSer(idxms,ind)+(tao_serv(ind)*VETao/tiempotran);
+                           BWP2P(idxms,ind)=BWP2P(idxms,ind)+(tao_mw(ind)*VETao);
+                           BWSer(idxms,ind)=BWSer(idxms,ind)+(tao_serv(ind)*VETao);
                         else
                            m=min(tao_cw(ind),tao_mw(ind));
-                           BWP2P(idxms,ind)=BWP2P(idxms,ind)+(m*VETao/tiempotran);
-                           BWSer(idxms,ind)=BWSer(idxms,ind)+((tao_cw(ind)-(m*VETao))/tiempotran);
+                           BWP2P(idxms,ind)=BWP2P(idxms,ind)+(m*VETao);
+                           BWSer(idxms,ind)=BWSer(idxms,ind)+((tao_cw(ind)-m)*VETao);
                         end
                     end
                  end
@@ -169,7 +169,9 @@ for idxc=1:length(C)
              %Obtener los promedios de seeds y downloaders para distintos
              %valores  de N y teta 
     %          X_prom(idxc,idxt)=x_prom;
-
+         BW(idxms,:)=BW(idxms,:)/tiempotran;
+         BWP2P(idxms,:)=BWP2P(idxms,:)/tiempotran;
+         BWSer(idxms,:)=BWSer(idxms,:)/tiempotran;
       end   
 
    end        

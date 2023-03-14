@@ -9,7 +9,7 @@ lmb=0.04;%Tasa de arribos
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
-IT=100;%Número de iteraciones
+IT=100000;%Número de iteraciones
 
 for idxc=1:length(C)
         
@@ -149,15 +149,15 @@ for idxc=1:length(C)
                     HV(idx+1)=HV(idx+1)+1;%Incrementar W en idx+1
                     tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
                     tiempotran=tiempotran+VETao;
-                    BW(idxms,:)=BW(idxms,:)+((tao_cw*VETao)/tiempotran);
+                    BW(idxms,:)=BW(idxms,:)+(tao_cw*VETao);
                     for ind=1:C(idxc)
                         if tao_cw(ind)>TAO_MW(ind)
-                           BWP2P(idxms,ind)=BWP2P(idxms,ind)+(tao_mw(ind)*VETao/tiempotran);
-                           BWSer(idxms,ind)=BWSer(idxms,ind)+(tao_serv(ind)*VETao/tiempotran);
+                           BWP2P(idxms,ind)=BWP2P(idxms,ind)+(tao_mw(ind)*VETao);
+                           BWSer(idxms,ind)=BWSer(idxms,ind)+(tao_serv(ind)*VETao);
                         else
                            m=min(tao_cw(ind),tao_mw(ind));
-                           BWP2P(idxms,ind)=BWP2P(idxms,ind)+(m*VETao/tiempotran);
-                           BWSer(idxms,ind)=BWSer(idxms,ind)+((tao_cw(ind)-(m*VETao))/tiempotran);
+                           BWP2P(idxms,ind)=BWP2P(idxms,ind)+(m*VETao);
+                           BWSer(idxms,ind)=BWSer(idxms,ind)+(tao_cw(ind)-m)(*VETao);
                         end
                     end
                  end
@@ -169,23 +169,23 @@ for idxc=1:length(C)
              %Obtener los promedios de seeds y downloaders para distintos
              %valores  de N y teta 
     %          X_prom(idxc,idxt)=x_prom;
-
+         BW(idxms,:)=BW(idxms,:)/tiempotran;
       end   
 
    end        
 end
 figure(1)
-G1=surf(C,ms,transpose(BW),'FaceColor',[0 0.4470 0.7410]);
+G1=surf(transpose(BW),'FaceColor',[0 0.4470 0.7410],'FaceAlpha',0.5);
 hold on
-G2=surf(C,ms,transpose(BWP2P),'FaceColor',[0.4940 0.1840 0.5560]);
-G3=surf(C,ms,transpose(BWSer),'FaceColor',[0.6350 0.0780 0.1840]);
+G2=surf(transpose(BWP2P),'FaceColor',[0.4940 0.1840 0.5560],'FaceAlpha',0.5);
+G3=surf(transpose(BWSer),'FaceColor',[0.6350 0.0780 0.1840],'FaceAlpha',0.5);
 % xticks([12:4:36])
 % yticks([0.002:0.001:0.01])
 %zticks([0:2:20])
 %zlim([0 20])
 %legend([G1 G2 G3],{'\mu_s=0 C\omega','P\omega=0.5C\omega','P\omega=0.8C\omega'})
-ylabel('\ms')
-xlabel('C')
+ylabel('C')
+xlabel('\mu_s')
 zlabel('BW')
 title('Ancho de Banda Consumido')
 hold off
