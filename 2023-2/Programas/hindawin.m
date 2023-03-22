@@ -3,15 +3,15 @@ close all
 
 %Declaración de Variables
 
-N=[24];% Número de ventanas
-teta=[2]*(10^-3);%Tasa de abandono general
+N=[96 84 72 60 48 36 24];% Número de ventanas
+teta=[2 4 6 8 10].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
 gamma=0.006;%Tasa de abandono general de los seeds
 X_prom=zeros(length(N),length(teta));%Matriz de downloaders promedio
 Y_prom=zeros(length(N),length(teta));%Matriz de seeds promedio
-IT=50000;
+IT=25000;
 
 for idxn=1:length(N)
         
@@ -114,37 +114,37 @@ for idxn=1:length(N)
                 W(idx+1)=W(idx+1)+1;%Incrementar W en idx+1
                 tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
              end 
-                wi_prom=wi_prom+(W(1:N(idxn))*Evfinal);
-                yi_prom=yi_prom+(W(N(idxn))*Evfinal);
+                wi_prom=wi_prom+(sum(W(1:N(idxn)))*Evfinal);
+                yi_prom=yi_prom+(W(N(idxn)+1)*Evfinal);
           end
-            w_prom=wi_prom./tp;
-            y_prom=yi_prom/tp;  
-%           if iter==1 ||  mod(iter,50)==0
-%               W
-%          end
+          w_prom=wi_prom/tp;
+          y_prom=yi_prom/tp;          
       end
          %Obtener los promedios de seeds y downloaders para distintos
          %valores  de N y teta 
-%          X_prom(idxn,idxt)=w_prom;
-%          Y_prom(idxn,idxt)=y_prom;
+         X_prom(idxn,idxt)=w_prom;
+         Y_prom(idxn,idxt)=y_prom;
    end        
 end
      
 figure(1)
-plot(0:N-1,w_prom,'b-o','LineWidth',0.5)
-%xticks([0:2:N])
-ylim([0 max(w_prom)+0.2])
+surf(N,teta,transpose(X_prom),'FaceAlpha',0.5)
+xticks([24:12:96])
+yticks([0.002:0.001:0.01])
+zticks([0:2:12])
+zlim([0 12])
+ylabel('\theta')
 xlabel('N')
-ylabel('x')
-title('Número de downloaders en equilibrio')
-% 
-% figure(2)
-% surf(N,teta,transpose(Y_prom),'FaceAlpha',0.5)
-% xticks([24:12:96])
-% yticks([0.002:0.001:0.01])
-% zticks([0:1:6])
-% zlim([0 6])
-% ylabel('\theta')
-% xlabel('N')
-% zlabel('y')
-% title('Número de seeds en equilibrio')
+zlabel('x')
+title('Número de leeches en equilibrio')
+
+figure(2)
+surf(N,teta,transpose(Y_prom),'FaceAlpha',0.5)
+xticks([24:12:96])
+yticks([0.002:0.001:0.01])
+zticks([0:1:6])
+zlim([0 6])
+ylabel('\theta')
+xlabel('N')
+zlabel('y')
+title('Número de seeds en equilibrio')
