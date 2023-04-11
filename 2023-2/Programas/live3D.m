@@ -10,8 +10,8 @@ c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
 %ms=0.5;%Tasa de subida CDN
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
-IT=100000;%Número de iteraciones
-
+IT=1000000;%Número de iteraciones
+tic
 for idxc=1:length(C)
         
    for idxt=1:length(teta) 
@@ -178,3 +178,4 @@ ylabel('\theta')
 xlabel('C')
 zlabel('x')
 title('Número de downloaders en equilibrio')
+toc
