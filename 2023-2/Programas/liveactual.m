@@ -11,7 +11,7 @@ mu=0.00255;%Tasa de subida general
 %ms=0.5;%Tasa de subida CDN
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 IT=1000000;%Número de iteraciones
-
+tic 
 for idxc=1:length(C)
         
    for idxt=1:length(teta) 
@@ -177,4 +177,4 @@ xticks([0:C])
 xlabel('C')
 ylabel('Dounloaders')
 title('Número de downloader promedio')
-
+toc

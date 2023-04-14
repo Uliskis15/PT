@@ -3,24 +3,24 @@ close all
 
 %Declaración de Variables
 
-C=[36 32 28 24 20 16 12];% Número de ventanas
-teta=[2 4 6 8 10].*(10^-3);%Tasa de abandono general
+C=[24];% Número de ventanas
+teta=[6].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
 %ms=0.5;%Tasa de subida CDN
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 IT=1000000;%Número de iteraciones
-tic
+
 for idxc=1:length(C)
         
    for idxt=1:length(teta) 
             
       cw=C(idxc)*c;%Tasa de descarga máxima
       mw=C(idxc)*mu;%Tasa de subida máxima
-      ms=1.24;
+      ms=40*mw;
       Pw=0.5*cw;%Tasa de producción del video
-      teta0=(teta(idxt)+Pw);%Tasa de abandono para usuarios en ventana 0
+      teta0=(teta+Pw);%Tasa de abandono para usuarios en ventana 0
       HV=zeros(1,C(idxc)+1);%Vector de poblaciones por ventana de la hiperventana
       xi_prom=0;%Cadena acumulativa para obtener el promedio por iteración
       x_prom=0;%Cadena acumulativa para obtener el promedio por iteración
@@ -51,7 +51,7 @@ for idxc=1:length(C)
              TArr=1/lmb;%Tasa promedio de arribo a la ventana 0
              TAb(1)=teta0*HV(1);%Tasa promedio de abandono de la ventana 0
              TAb(2:C(idxc)+1)=teta(idxt)*HV(2:C(idxc)+1);%Tasa promedio de abandono de la ventana 1 a C+1
-             ttran=Pw*HV(2:C(idxc)+1);%Tasa promedio de producción de la ventana 2 a la ventana C+1             
+             ttran=1/(Pw*sum(HV(2:C(idxc)+1)));%Tasa promedio de producción de la ventana 2 a la ventana C+1             
              
              %Tranferencia para usuarios en ventanas 0 a C-1
              tao_cw(1:C(idxc))=cw*HV(1:C(idxc));%Tasa promedio de descarga en abundancia
@@ -83,7 +83,7 @@ for idxc=1:length(C)
     
              VEArr=exprnd(TArr);%V.A para arribos
              ab=exprnd(1./TAb);%Vector de V.A para abandonos
-             prod=exprnd(1./ttran);%Vector de V.A para tranferencias inferiores
+             VEPw=exprnd(ttran);%Vector de V.A para tranferencias inferiores
              tran=exprnd(1./tao_min);%Vector de V.A para transferencias superiores
 
              %Tiempos infinitos para descartar un abandono o transferencia
@@ -97,14 +97,14 @@ for idxc=1:length(C)
              end
              VEAb=min(tab);% Obtener minimo de ab
               
-             for idxpw=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
-                 if(prod(idxpw)==0)
-                    TProd(idxpw)=1000000;
-                 else
-                    TProd(idxpw)=prod(idxpw);
-                 end
-             end
-             VEPw=min(TProd);% Obtener minimo de prod
+%              for idxpw=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
+%                  if(prod(idxpw)==0)
+%                     TProd(idxpw)=1000000;
+%                  else
+%                     TProd(idxpw)=prod(idxpw);
+%                  end
+%              end
+%              VEPw=min(TProd);% Obtener minimo de prod
 
              for idxtao=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
                  if(tran(idxtao)==0)
@@ -135,9 +135,10 @@ for idxc=1:length(C)
                 tp=tp+VEArr;%Se suma el tiempo promedio a tp en 1
                 
              elseif Evfinal==VEPw
-                idx=find(prod==VEPw);%Encontrar indice donde ab == VEAb
-                HV(idx+1)=HV(idx+1)-1;%Decrementar W en idx
-                HV(idx)=HV(idx)+1;%Incrementar W en idx-1
+                for idx=1:C(idxc)
+                    HV(idx)=HV(idx+1);%Decrementar W en i
+                end    
+                HV(C(idxc)+1)=0;
                 tp=tp+VEPw;%Se suma el tiempo promedio a tp en idx
 
              elseif Evfinal==VETao
@@ -158,24 +159,23 @@ for idxc=1:length(C)
                     end
                 end
              end
-             xi_prom=xi_prom+(sum(HV(1:C(idxc)+1))*Evfinal); 
+             xi_prom=xi_prom+(HV(1:C(idxc)+1)*Evfinal); 
           end
-          x_prom=xi_prom/tp;
-      end   
+      end 
+      x_prom=xi_prom/tp;
+     
          %Obtener los promedios de seeds y downloaders para distintos
          %valores  de N y teta 
-         X_prom(idxc,idxt)=x_prom;
+%          X_prom(idxc,idxt)=x_prom;
 
    end        
 end
 figure(1)
-surf(C,teta,transpose(X_prom),'FaceAlpha',0.5)
-xticks([12:4:36])
-yticks([0.002:0.001:0.01])
-%zticks([0:2:12])
-zlim([0 12])
-ylabel('\theta')
+plot(0:C,x_prom,'b-*','LineWidth',0.5)
+ylim([0 max(x_prom)+0.2])
+xlim([0 C])
+xticks([0:C])
 xlabel('C')
-zlabel('x')
-title('Número de downloaders en equilibrio')
-toc
+ylabel('Dounloaders')
+title('Número de downloader promedio')
+

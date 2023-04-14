@@ -11,7 +11,7 @@ mu=0.00255;%Tasa de subida general
 %ms=0.5;%Tasa de subida CDN
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 IT=1000000;%Número de iteraciones
-
+tic
 for idxc=1:length(C)
         
    for idxt=1:length(teta) 
@@ -170,7 +170,7 @@ for idxc=1:length(C)
    end        
 end
 
-figure(2)
+figure(1)
 plot(0:C-1,BW/tiempotran,'b-*','LineWidth',0.5)
 xlim([0 C])
 hold on
@@ -182,3 +182,4 @@ xticks([0:2:C])
 xlabel('C')
 ylabel('Ventanas/segundo')
 title('Anchos de banda del Sistema')
+toc

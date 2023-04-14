@@ -11,7 +11,7 @@ mu=0.00255;%Tasa de subida general
 %ms=0.5;%Tasa de subida CDN
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 IT=1000000;%Número de iteraciones
-tic
+
 for idxc=1:length(C)
         
    for idxt=1:length(teta) 
@@ -51,7 +51,7 @@ for idxc=1:length(C)
              TArr=1/lmb;%Tasa promedio de arribo a la ventana 0
              TAb(1)=teta0*HV(1);%Tasa promedio de abandono de la ventana 0
              TAb(2:C(idxc)+1)=teta(idxt)*HV(2:C(idxc)+1);%Tasa promedio de abandono de la ventana 1 a C+1
-             ttran=Pw*HV(2:C(idxc)+1);%Tasa promedio de producción de la ventana 2 a la ventana C+1             
+             ttran=1/(Pw*sum(HV(2:C(idxc)+1)));%Tasa promedio de producción de la ventana 2 a la ventana C+1             
              
              %Tranferencia para usuarios en ventanas 0 a C-1
              tao_cw(1:C(idxc))=cw*HV(1:C(idxc));%Tasa promedio de descarga en abundancia
@@ -83,7 +83,7 @@ for idxc=1:length(C)
     
              VEArr=exprnd(TArr);%V.A para arribos
              ab=exprnd(1./TAb);%Vector de V.A para abandonos
-             prod=exprnd(1./ttran);%Vector de V.A para tranferencias inferiores
+             VEPw=exprnd(ttran);%Vector de V.A para tranferencias inferiores
              tran=exprnd(1./tao_min);%Vector de V.A para transferencias superiores
 
              %Tiempos infinitos para descartar un abandono o transferencia
@@ -97,14 +97,14 @@ for idxc=1:length(C)
              end
              VEAb=min(tab);% Obtener minimo de ab
               
-             for idxpw=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
-                 if(prod(idxpw)==0)
-                    TProd(idxpw)=1000000;
-                 else
-                    TProd(idxpw)=prod(idxpw);
-                 end
-             end
-             VEPw=min(TProd);% Obtener minimo de prod
+%              for idxpw=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
+%                  if(prod(idxpw)==0)
+%                     TProd(idxpw)=1000000;
+%                  else
+%                     TProd(idxpw)=prod(idxpw);
+%                  end
+%              end
+%              VEPw=min(TProd);% Obtener minimo de prod
 
              for idxtao=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
                  if(tran(idxtao)==0)
@@ -135,9 +135,10 @@ for idxc=1:length(C)
                 tp=tp+VEArr;%Se suma el tiempo promedio a tp en 1
                 
              elseif Evfinal==VEPw
-                idx=find(prod==VEPw);%Encontrar indice donde ab == VEAb
-                HV(idx+1)=HV(idx+1)-1;%Decrementar W en idx
-                HV(idx)=HV(idx)+1;%Incrementar W en idx-1
+                for idx=1:C(idxc)
+                    HV(idx)=HV(idx+1);%Decrementar W en i
+                end    
+                HV(C(idxc)+1)=0;
                 tp=tp+VEPw;%Se suma el tiempo promedio a tp en idx
 
              elseif Evfinal==VETao
@@ -173,9 +174,8 @@ surf(C,teta,transpose(X_prom),'FaceAlpha',0.5)
 xticks([12:4:36])
 yticks([0.002:0.001:0.01])
 %zticks([0:2:12])
-zlim([0 12])
+zlim([0 4])
 ylabel('\theta')
 xlabel('C')
 zlabel('x')
 title('Número de downloaders en equilibrio')
-toc
