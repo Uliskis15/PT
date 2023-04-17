@@ -51,7 +51,7 @@ for idxc=1:length(C)
              TArr=1/lmb;%Tasa promedio de arribo a la ventana 0
              TAb(1)=teta0*HV(1);%Tasa promedio de abandono de la ventana 0
              TAb(2:C(idxc)+1)=teta(idxt)*HV(2:C(idxc)+1);%Tasa promedio de abandono de la ventana 1 a C+1
-             ttran=1/(Pw*sum(HV(2:C(idxc)+1)));%Tasa promedio de producción de la ventana 2 a la ventana C+1             
+             ttran=1/Pw;%Tasa promedio de producción de la ventana 2 a la ventana C+1             
              
              %Tranferencia para usuarios en ventanas 0 a C-1
              tao_cw(1:C(idxc))=cw*HV(1:C(idxc));%Tasa promedio de descarga en abundancia
@@ -174,7 +174,7 @@ surf(C,teta,transpose(X_prom),'FaceAlpha',0.5)
 xticks([12:4:36])
 yticks([0.002:0.001:0.01])
 %zticks([0:2:12])
-zlim([0 4])
+zlim([0 10])
 ylabel('\theta')
 xlabel('C')
 zlabel('x')
