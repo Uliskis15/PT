@@ -3,8 +3,8 @@ close all
 
 %Declaración de Variables
 
-C=[24];% Número de ventanas
-teta=[6].*(10^-3);%Tasa de abandono general
+C=[36];% Número de ventanas
+teta=[8].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
