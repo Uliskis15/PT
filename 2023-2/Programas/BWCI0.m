@@ -3,8 +3,8 @@ close all
 
 %Declaración de Variables
 
-C=[24];% Número de ventanas
-teta=[2].*(10^-3);%Tasa de abandono general
+C=[36];% Número de ventanas
+teta=[4].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
@@ -51,7 +51,7 @@ for idxc=1:length(C)
              TArr=1/lmb;%Tasa promedio de arribo a la ventana 0
              TAb(1)=teta0*HV(1);%Tasa promedio de abandono de la ventana 0
              TAb(2:C(idxc)+1)=teta(idxt)*HV(2:C(idxc)+1);%Tasa promedio de abandono de la ventana 1 a C+1
-             ttran=1/(Pw*sum(HV(2:C(idxc)+1)));%Tasa promedio de producción de la ventana 2 a la ventana C+1             
+             ttran=1/Pw;%Tasa promedio de producción de la ventana 2 a la ventana C+1             
              
              %Tranferencia para usuarios en ventanas 0 a C-1
              tao_cw(1:C(idxc))=cw*HV(1:C(idxc));%Tasa promedio de descarga en abundancia
