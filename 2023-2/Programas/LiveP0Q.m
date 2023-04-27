@@ -4,7 +4,7 @@ close all
 %Declaración de Variables
 
 C=[36];% Número de ventanas
-Q=24;
+Q=36;
 teta=[2].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
@@ -61,7 +61,7 @@ for idxc=1:length(C)
                  if HV(i)==0
                      tao_mw(i)=1000000;
                  else
-                     ls=min(i+Q,C(idxc)+1);
+                     ls= C(idxc)+1;%min(i+Q,C(idxc)+1);
                      for k=i+1:ls
                          tao_mw(i)=tao_mw(i)+(mw*HV(i)*(HV(k)/sum(HV(1:k-1))));%Tasa promedio de descarga en penuria
                      end
