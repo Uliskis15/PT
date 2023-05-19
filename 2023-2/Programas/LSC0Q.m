@@ -3,12 +3,12 @@ close all
 
 %Declaración de Variables
 
-C=[24];% Número de ventanas
+C=[36];% Número de ventanas
 Q=24;
 teta=[2].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
-mu=0.00255;%Tasa de subida general
+mu=0.04;%Tasa de subida general
 %ms=0.5;%Tasa de subida CDN
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 IT=1000000;%Número de iteraciones
