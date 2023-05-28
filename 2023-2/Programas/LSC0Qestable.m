@@ -4,7 +4,7 @@ close all
 %Declaración de Variables
 
 C=[36];% Número de ventanas
-Q=36;
+Q=12;
 teta=[2].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general

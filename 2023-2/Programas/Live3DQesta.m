@@ -3,13 +3,15 @@ close all
 
 %Declaración de Variables
 
-C=[36];% Número de ventanas
-teta=[2].*(10^-3);%Tasa de abandono general
+C=[36 32 28 24 20 16 12];% Número de ventanas
+teta=[2 4 6 8 10].*(10^-3);%Tasa de abandono general
+Q=12;
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
 %ms=0.5;%Tasa de subida CDN
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
+CX_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 IT=1000000;%Número de iteraciones
 
 for idxc=1:length(C)
@@ -20,10 +22,12 @@ for idxc=1:length(C)
       mw=C(idxc)*mu;%Tasa de subida máxima
       ms=40*mw;
       Pw=0.5*cw;%Tasa de producción del video
-      teta0=(teta+Pw);%Tasa de abandono para usuarios en ventana 0
+      teta0=(teta(idxt)+Pw);%Tasa de abandono para usuarios en ventana 0
       HV=zeros(1,C(idxc)+1);%Vector de poblaciones por ventana de la hiperventana
       xi_prom=0;%Cadena acumulativa para obtener el promedio por iteración
+      cxi_prom=0;
       x_prom=0;%Cadena acumulativa para obtener el promedio por iteración
+      cx_prom=0;%Cadena acumulativa para obtener el promedio por iteración
       BW=zeros(1,C(idxc));%Cadena acumulativa para obtener el promedio por iteración
       BWP2P=zeros(1,C(idxc));%Cadena acumulativa para obtener el promedio por iteración
       BWSer=zeros(1,C(idxc));%Cadena acumulativa para obtener el promedio por iteración
@@ -60,7 +64,8 @@ for idxc=1:length(C)
                  if HV(i)==0
                      tao_mw(i)=1000000;
                  else
-                     for k=i+1:C(idxc)+1
+                     ls=min(i+Q,C(idxc)+1);
+                     for k=i+1:ls
                          tao_mw(i)=tao_mw(i)+(mw*HV(i)*(HV(k)/sum(HV(1:k-1))));%Tasa promedio de descarga en penuria
                      end
                  end           
@@ -158,74 +163,39 @@ for idxc=1:length(C)
                     end
                 end
              end
-             xi_prom=xi_prom+(HV(1:C(idxc)+1)*Evfinal); 
+             xi_prom=xi_prom+(sum(HV(1:C(idxc)+1))*Evfinal); 
+             cxi_prom=cxi_prom+(HV(C(idxc)+1)*Evfinal); 
           end
       end 
       x_prom=xi_prom/tp;
+      cx_prom=cxi_prom/tp;
      
          %Obtener los promedios de seeds y downloaders para distintos
          %valores  de N y teta 
-%          X_prom(idxc,idxt)=x_prom;
+         X_prom(idxc,idxt)=x_prom;
+         CX_prom(idxc,idxt)=cx_prom;
 
    end        
 end
 
 figure(1)
-plot(0:C-1,BW/tiempotran,'b-*','LineWidth',0.5)
-xlim([0 C])
-hold on
-plot(0:C-1,BWP2P/tiempotran,'r--','LineWidth',0.5)
-plot(0:C-1,BWSer/tiempotran,'m','LineWidth',0.5)
-hold off
-legend('C_\omega*X_i','BWP2P','BWServ')
-%xticks([0:2:C])
-xlabel('\iti')
-ylabel('Ventanas/segundo')
-title('Anchos de Banda Consumidos en el Sistema')
-
-bw=cw*x_prom(1:C(idxc));
-bwp2p=zeros(1, C(idxc));
-bwser=zeros(1, C(idxc));
-
-for i=1:C(idxc)
-    if x_prom(i)==0
-       tao_mw(i)=1000000;
-    else
-       for k=i+1:C(idxc)+1
-           tao_mw(i)=tao_mw(i)+(mw*x_prom(i)*(x_prom(k)/sum(x_prom(1:k-1))));%Tasa promedio de descarga en penuria
-       end
-    end
-end
-             
-for i=1:C(idxc)
-    if x_prom(i)==0
-       tao_serv(i)=1000000;
-    else
-       tao_serv(i)=tao_serv(i)+ms*(x_prom(i)/sum(x_prom(1:C(idxc))));
-    end           
-end
-TAO_MW=tao_mw+tao_serv;
-
-for ind=1:C(idxc)
-    if bw(ind)>TAO_MW(ind)
-       bwp2p(ind)=tao_mw(ind);
-       bwser(ind)=tao_serv(ind);
-    else
-       m=min(bw(ind),tao_mw(ind));
-       bwp2p(ind)=m;
-       bwser(ind)=bw(ind)-m;
-    end
-end
+surf(C,teta,transpose(X_prom),'FaceAlpha',0.5)
+xticks([12:4:36])
+yticks([0.002:0.001:0.01])
+%zticks([0:2:12])
+zlim([0 8])
+ylabel('\theta')
+xlabel('C')
+zlabel('x')
+title('Número de \itDownloaders Promedio')
 
 figure(2)
-plot(0:C-1,bw,'b-*','LineWidth',0.5)
-xlim([0 C])
-hold on
-plot(0:C-1,bwp2p,'r--','LineWidth',0.5)
-plot(0:C-1,bwser,'m','LineWidth',0.5)
-hold off
-legend('C_\omega*X_i','BWP2P','BWServ')
-%xticks([0:2:C])
-xlabel('\iti')
-ylabel('Ventanas/segundo')
-title('Anchos de Banda Consumidos en el Sistema')
+surf(C,teta,transpose(CX_prom),'FaceAlpha',0.5)
+xticks([12:4:36])
+yticks([0.002:0.001:0.01])
+%zticks([0:2:12])
+zlim([0 2])
+ylabel('\theta')
+xlabel('C')
+zlabel('x')
+title('Número de \itDownloaders Promedio en la Ventana C')

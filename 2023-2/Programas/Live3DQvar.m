@@ -3,9 +3,9 @@ close all
 
 %Declaración de Variables
 
-C=[36];% Número de ventanas
+C=[36 32 28 24 20 16 12];% Número de ventanas
+teta=[2 4 6 8 10].*(10^-3);%Tasa de abandono general
 Q=[12 24 36];
-teta=[2].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
@@ -17,6 +17,9 @@ BWSer=zeros(length(Q),C);%Cadena acumulativa para obtener el promedio por iterac
 bw=zeros(length(Q),C);
 bwp2p=zeros(length(Q), C);
 bwser=zeros(length(Q), C);
+CH1=zeros(length(C),length(teta));%Almacen de gráfica de lmb1
+CH2=zeros(length(C),length(teta));%Almacen de gráfica de lmb2
+CH3=zeros(length(C),length(teta));%Almacen de gráfica de lmb3
 IT=1000000;%Número de iteraciones
 
 for idxq=1:length(Q)
@@ -28,7 +31,7 @@ for idxq=1:length(Q)
           mw=C(idxc)*mu;%Tasa de subida máxima
           ms=40*mw;
           Pw=0.5*cw;%Tasa de producción del video
-          teta0=(teta+Pw);%Tasa de abandono para usuarios en ventana 0
+          teta0=(teta(idxt)+Pw);%Tasa de abandono para usuarios en ventana 0
           HV=zeros(1,C(idxc)+1);%Vector de poblaciones por ventana de la hiperventana
           xi_prom=0;%Cadena acumulativa para obtener el promedio por iteración
           x_prom=0;%Cadena acumulativa para obtener el promedio por iteración
@@ -165,103 +168,38 @@ for idxq=1:length(Q)
                         end
                     end
                  end
-                 xi_prom=xi_prom+(HV(1:C(idxc)+1)*Evfinal); 
+                 xi_prom=xi_prom+(sum(HV(1:C(idxc)+1))*Evfinal);
               end
           end 
           x_prom=xi_prom/tp;
 
              %Obtener los promedios de seeds y downloaders para distintos
              %valores  de N y teta 
-    %          X_prom(idxc,idxt)=x_prom;
+              X_prom(idxc,idxt)=x_prom;
 
        end        
     end
-    
-    bw(idxq,:)=cw*x_prom(1:C(idxc));
-    for i=1:C(idxc)
-        if x_prom(i)==0
-           tao_mw(i)=1000000;
-        else
-           for k=i+1:C(idxc)+1
-               tao_mw(i)=tao_mw(i)+(mw*x_prom(i)*(x_prom(k)/sum(x_prom(1:k-1))));%Tasa promedio de descarga en penuria
-           end
-        end
-    end
-
-    for i=1:C(idxc)
-        if x_prom(i)==0
-           tao_serv(i)=1000000;
-        else
-           tao_serv(i)=tao_serv(i)+ms*(x_prom(i)/sum(x_prom(1:C(idxc))));
-        end           
-    end
-    TAO_MW=tao_mw+tao_serv;
-
-    for ind=1:C(idxc)
-        if bw(idxq,ind)>TAO_MW(ind)
-           bwp2p(idxq,ind)=tao_mw(ind);
-           bwser(idxq,ind)=tao_serv(ind);
-        else
-           m=min(bw(idxq,ind),tao_mw(ind));
-           bwp2p(idxq,ind)=m;
-           bwser(idxq,ind)=bw(idxq,ind)-m;
-        end
+     if idxq==1
+        CH1=X_prom;
+    elseif idxq==2
+        CH2=X_prom;
+    else
+        CH3=X_prom;
     end
 end
 
-
-Bdc=[sum(bw(1,:)) sum(bw(2,:)) sum(bw(3,:))];
-Bdcp2p=[sum(bwp2p(1,:)) sum(bwp2p(2,:)) sum(bwp2p(3,:))];
-Bdcser=[sum(bwser(1,:)) sum(bwser(2,:)) sum(bwser(3,:))];
-
 figure(1)
-plot(0:C-1,bw(1,:)/tp,'b','LineWidth',1.5)
-xlim([0 C])
+G1=surf(C,teta,transpose(CH1),'FaceColor',[0 0.4470 0.7410]);
 hold on
-plot(0:C-1,bw(2,:)/tp,'m--','LineWidth',1)
-plot(0:C-1,bw(3,:)/tp,'c*','LineWidth',0.5)
+G2=surf(C,teta,transpose(CH2),'FaceColor',[0.4940 0.1840 0.5560]);
+G3=surf(C,teta,transpose(CH3),'FaceColor',[0.6350 0.0780 0.1840]);
+xticks([12:4:36])
+yticks([0.002:0.001:0.01])
+%zticks([0:2:20])
+%zlim([0 20])
+legend([G1 G2 G3],{'Q=12','Q=24','Q=36'})
+ylabel('\theta')
+xlabel('C')
+zlabel('x')
+title('Número de \itDownloaders Promedio')
 hold off
-legend('Q=12','Q=24','Q=36')
-%xticks([0:2:C])
-xlabel('i')
-ylabel('Ventanas/segundo')
-title('Ancho de Banda Total Consumido en el Sistema')
-
-figure(2)
-plot(0:C-1,bwp2p(1,:)/tp,'b','LineWidth',1.5)
-xlim([0 C])
-hold on
-plot(0:C-1,bwp2p(2,:)/tp,'m--','LineWidth',1)
-plot(0:C-1,bwp2p(3,:)/tp,'c*','LineWidth',0.5)
-hold off
-legend('Q=12','Q=24','Q=36')
-%xticks([0:2:36])
-xlabel('i')
-ylabel('Ventanas/segundo')
-title('Ancho de Banda Consumido de la red P2P')
-
-figure(3)
-plot(0:C-1,bwser(1,:)/tp,'b','LineWidth',1.5)
-xlim([0 C])
-hold on
-plot(0:C-1,bwser(2,:)/tiempotran,'m--','LineWidth',1)
-plot(0:C-1,bwser(3,:)/tiempotran,'c*','LineWidth',0.5)
-hold off
-legend('Q=12','Q=24','Q=36')
-%xticks([0:2:C])
-xlabel('i')
-ylabel('Ventanas/segundo')
-title('Ancho de Banda Consumido de la red CDN')
-
-figure(4)
-plot(Bdc/tiempotran,'b-*','LineWidth',0.5)
-xlim([1 3])
-hold on
-plot(Bdcp2p/tiempotran,'r--','LineWidth',0.5)
-plot(Bdcser/tiempotran,'m','LineWidth',0.5)
-hold off
-legend('BDC','BWP2P','BWServ')
-xticks([12 24 36])
-xlabel('Q')
-ylabel('Ventanas/segundo')
-title('Anchos de banda del Sistema')
