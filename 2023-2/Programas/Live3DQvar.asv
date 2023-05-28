@@ -29,9 +29,12 @@ for idxq=1:length(Q)
           HV=zeros(1,C(idxc)+1);%Vector de poblaciones por ventana de la hiperventana
           xi_prom=0;%Cadena acumulativa para obtener el promedio por iteración
           x_prom=0;%Cadena acumulativa para obtener el promedio por iteración
-          BW=zeros(1,C(idxc));%Cadena acumulativa para obtener el promedio por iteración
-          BWP2P=zeros(1,C(idxc));%Cadena acumulativa para obtener el promedio por iteración
-          BWSer=zeros(1,C(idxc));%Cadena acumulativa para obtener el promedio por iteración
+          BW=zeros(length(Q),C(idxc));%Cadena acumulativa para obtener el promedio por iteración
+          BWP2P=zeros(length(Q),C(idxc));%Cadena acumulativa para obtener el promedio por iteración
+          BWSer=zeros(length(Q),C(idxc));%Cadena acumulativa para obtener el promedio por iteración
+          bw=zeros(length(Q),C(idxc));
+          bwp2p=zeros(length(Q), C(idxc));
+          bwser=zeros(length(Q), C);
           tp=0;%Vector de tiempos promedio por ventana
           TAb=zeros(1,C(idxc)+1);%Vector para tasa de abandono
           tab=zeros(1,C(idxc)+1);%Vector para tasa de abandono
@@ -153,15 +156,15 @@ for idxq=1:length(Q)
                     HV(idx+1)=HV(idx+1)+1;%Incrementar W en idx+1
                     tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
                     tiempotran=tiempotran+VETao;
-                    BW(1,:)=BW(1,:)+(tao_cw*VETao);
+                    BW(idxq,:)=BW(idxq,:)+(tao_cw*VETao);
                     for ind=1:C(idxc)
                         if tao_cw(ind)>TAO_MW(ind)
-                           BWP2P(1,ind)=BWP2P(1,ind)+(tao_mw(ind)*VETao);
-                           BWSer(1,ind)=BWSer(1,ind)+(tao_serv(ind)*VETao);
+                           BWP2P(idxq,ind)=BWP2P(idxq,ind)+(tao_mw(ind)*VETao);
+                           BWSer(idxq,ind)=BWSer(idxq,ind)+(tao_serv(ind)*VETao);
                         else
                            m=min(tao_cw(ind),tao_mw(ind));
-                           BWP2P(1,ind)=BWP2P(1,ind)+(m*VETao);
-                           BWSer(1,ind)=BWSer(1,ind)+((tao_cw(ind)-m)*VETao);
+                           BWP2P(idxq,ind)=BWP2P(idxq,ind)+(m*VETao);
+                           BWSer(idxq,ind)=BWSer(idxq,ind)+((tao_cw(ind)-m)*VETao);
                         end
                     end
                  end
@@ -186,10 +189,10 @@ for idxq=1:length(Q)
 end
 
 figure(1)
-G1=surf(C,teta,transpose(CH1),'FaceColor',[0 0.4470 0.7410],'FaceAlpha',1);
+G1=surf(C,teta,transpose(CH1),'FaceColor',[0 0.4470 0.7410]);
 hold on
-G2=surf(C,teta,transpose(CH2),'FaceColor',[0.4940 0.1840 0.5560],'FaceAlpha',0.75);
-G3=surf(C,teta,transpose(CH3),'FaceColor',[0.6350 0.0780 0.1840],'FaceAlpha',0.5);
+G2=surf(C,teta,transpose(CH2),'FaceColor',[0.4940 0.1840 0.5560]);
+G3=surf(C,teta,transpose(CH3),'FaceColor',[0.6350 0.0780 0.1840]);
 xticks([12:4:36])
 yticks([0.002:0.001:0.01])
 %zticks([0:2:20])
