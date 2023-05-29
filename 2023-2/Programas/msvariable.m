@@ -186,10 +186,11 @@ G3=surf(transpose(BWSer),'FaceColor',[0.6350 0.0780 0.1840],'FaceAlpha',0.5);
 %zticks([0:2:20])
 %zlim([0 20])
 %legend([G1 G2 G3],{'\mu_s=0 C\omega','P\omega=0.5C\omega','P\omega=0.8C\omega'})
-ylabel('C')
+legend([G1 G2 G3],{'C_\omega*X_i','BWP2P','BWServ'})
+ylabel('\iti')
 xlabel('\mu_s')
 zlabel('BW')
-title('Ancho de Banda Consumido')
+title('Ancho de Banda Total Consumido')
 hold off
 
 

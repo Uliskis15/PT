@@ -3,8 +3,8 @@ close all
 
 %Declaración de Variables
 
-C=[36];% Número de ventanas
-Q=24;
+C=[20];% Número de ventanas
+Q=8;
 teta=[2].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
@@ -177,9 +177,9 @@ plot(0:C,x_prom,'b-*','LineWidth',0.5)
 ylim([0 max(x_prom)+0.2])
 xlim([0 C])
 %xticks([0:C])
-xlabel('C')
-ylabel('Dounloaders')
-title('Número de downloader promedio')
+xlabel('\iti')
+ylabel('\itDownloaders')
+title('Número de \itDownloaders Promedio')
 
 figure(2)
 plot(0:C-1,BW/tiempotran,'b-*','LineWidth',0.5)
@@ -190,6 +190,6 @@ plot(0:C-1,BWSer/tiempotran,'m','LineWidth',0.5)
 hold off
 legend('C_\omega*X_i','BWP2P','BWServ')
 %xticks([0:2:C])
-xlabel('C')
+xlabel('\iti')
 ylabel('Ventanas/segundo')
-title('Anchos de banda del Sistema')
+title('Anchos de Banda Consumidos en el Sistema')
