@@ -19,7 +19,7 @@ for idxc=1:length(C)
             
       cw=C(idxc)*c;%Tasa de descarga máxima
       mw=C(idxc)*mu;%Tasa de subida máxima
-      ms=40*mw;
+      ms=1.24;
       Pw=0.5*cw;%Tasa de producción del video
       teta0=(teta+Pw);%Tasa de abandono para usuarios en ventana 0
       HV=zeros(1,C(idxc)+1);%Vector de poblaciones por ventana de la hiperventana
