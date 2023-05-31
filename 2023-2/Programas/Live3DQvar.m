@@ -186,9 +186,9 @@ for idxq=1:length(Q)
 end
 
 figure(1)
-G1=surf(C,teta,transpose(CH1),'FaceColor',[0 0.4470 0.7410],'FaceAlpha',1);
+G1=surf(C,teta,transpose(CH1),'FaceColor',[0 0.4470 0.7410],'FaceAlpha',0.5);
 hold on
-G2=surf(C,teta,transpose(CH2),'FaceColor',[0.4940 0.1840 0.5560],'FaceAlpha',0.75);
+G2=surf(C,teta,transpose(CH2),'FaceColor',[0.4940 0.1840 0.5560],'FaceAlpha',0.5);
 G3=surf(C,teta,transpose(CH3),'FaceColor',[0.6350 0.0780 0.1840],'FaceAlpha',0.5);
 xticks([12:4:36])
 yticks([0.002:0.001:0.01])
