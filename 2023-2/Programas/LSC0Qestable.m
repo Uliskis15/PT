@@ -3,8 +3,8 @@ close all
 
 %Declaración de Variables
 
-C=[36];% Número de ventanas
-Q=12;
+C=[12];% Número de ventanas
+Q=4;
 teta=[2].*(10^-3);%Tasa de abandono general
 lmb=0.04;%Tasa de arribos 
 c=0.00407;%Tasa de descarga general
@@ -19,7 +19,7 @@ for idxc=1:length(C)
             
       cw=C(idxc)*c;%Tasa de descarga máxima
       mw=C(idxc)*mu;%Tasa de subida máxima
-      ms=40*mw;
+      ms=1.24;
       Pw=0.5*cw;%Tasa de producción del video
       teta0=(teta+Pw);%Tasa de abandono para usuarios en ventana 0
       HV=zeros(1,C(idxc)+1);%Vector de poblaciones por ventana de la hiperventana
@@ -181,9 +181,9 @@ plot(0:C-1,BWSer/tiempotran,'m','LineWidth',0.5)
 hold off
 legend('C_\omega*X_i','BWP2P','BWServ')
 %xticks([0:2:C])
-xlabel('C')
+xlabel('\iti')
 ylabel('Ventanas/segundo')
-title('Anchos de banda del Sistema')
+title('Anchos de Banda Consumidos en el Sistema')
 
 bw=cw*x_prom(1:C(idxc));
 bwp2p=zeros(1, C(idxc));
@@ -228,6 +228,6 @@ plot(0:C-1,bwser,'m','LineWidth',0.5)
 hold off
 legend('C_\omega*X_i','BWP2P','BWServ')
 %xticks([0:2:C])
-xlabel('C')
+xlabel('\it')
 ylabel('Ventanas/segundo')
-title('Anchos de banda del Sistema')
+title('Anchos de Banda Consumidos en el Sistema')
