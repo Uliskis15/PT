@@ -26,19 +26,20 @@ for idxc=1:length(C)
       bw_iter=zeros(1,C(idxc));%Variable de ancho de banda total consumido por iteración
       bwp2p_iter=zeros(1,C(idxc));%Variable de ancho de banda consumido de la red P2P por iteración
       bwserv_iter=zeros(1,C(idxc));%Variable de ancho de banda consumido de la red CDN por iteración
-      tp=0;%Variable de tiempo de simulación
-      TAb=zeros(1,C(idxc)+1);%Vector para desconexión
-      tab=zeros(1,C(idxc)+1);%Vector para V.A de desconexión
-      ttran=zeros(1,C(idxc));%Vector para V.A de transferencia inferior
-      TProd=zeros(1,C(idxc));%Vector para transferencia inferior
-      TTran=zeros(1,C(idxc));%Vector para transferencia superior
+      tp=0;%Variable de tiempo de simulación}
+      TArr=0%Tasa de conexión de la población 0
+      TAb=zeros(1,C(idxc)+1);%Tasa de desconexión de las poblaciones 0-C
+      ttran=0;%Tasa de producción de video
+      tao_mw=zeros(1,C(idxc));%Recursos peers
+      tao_serv=zeros(1,C(idxc));%Recursos servidores
+      tao_cw=zeros(1,C(idxc));%Tasa máxima de descarga
+      tab=zeros(1,C(idxc)+1);%Desconexiones inválidas      
+      %TProd=zeros(1,C(idxc));%Vector para transferencia inferior
+      %TTran=zeros(1,C(idxc));%Vector para transferencia superior
       tiempotran=0;%Tiempo promedio para consumo de ancho de banda
       
       for iter=1:IT   
-          tao_mw=zeros(1,C(idxc));%Vector para tasa de transición peers
-          tao_serv=zeros(1,C(idxc));%Vector para tasa de transición servidores
-          tao_cw=zeros(1,C(idxc));%Vector para tasa de descarga
-          
+                    
           %Caso estado (0,0,0,....,0)
           if HV(1:C(idxc))==0%Conexión porque las poblaciones de 0 a C+1 son 0 
              HV(1)=HV(1)+1;%Incremento en una unidad de población en la ventana 0
@@ -47,20 +48,20 @@ for idxc=1:length(C)
           else%Determinar que evento ocurrio porque las poblaciones de 0 a C+1 son ~=0
               
              %Generar tasas de conexión, desconexión, transferencia vii y transferencia VSI por ventana
-             TArr=1/lmb;%Conexión a la ventana 0
-             TAb(1)=teta0*HV(1);%Desconexión de la población en la ventana 0
-             TAb(2:C(idxc)+1)=teta(idxt)*HV(2:C(idxc)+1);%Desconexión de las ventanas 1 a C+1
+             TArr=1/lmb;
+             TAb(1)=teta0*HV(1);%Tasa de desconexión de la población en la ventana 0
+             TAb(2:C(idxc)+1)=teta(idxt)*HV(2:C(idxc)+1);%Tasa de desconexión de las ventanas 1 a C
              ttran=1/Pw;%Producción de una nueva ventana             
              
              %Tranferencia para peers en ventanas 0 a C-1
-             tao_cw(1:C(idxc))=cw*HV(1:C(idxc));%Tasa máxima de descarga en abundancia
+             tao_cw(1:C(idxc))=cw*HV(1:C(idxc));%Tasa máxima de descarga de las poblaciones 0 a C-1
                    
              for i=1:C(idxc)
                  if HV(i)==0
                      tao_mw(i)=1000000;
                  else
                      for k=i+1:C(idxc)+1
-                         tao_mw(i)=tao_mw(i)+(mw*HV(i)*(HV(k)/sum(HV(1:k-1))));%Tasa promedio de descarga en penuria
+                         tao_mw(i)=tao_mw(i)+(mw*HV(i)*(HV(k)/sum(HV(1:k-1))));%Recursos proporcionados por la red p2p
                      end
                  end           
              end
@@ -69,23 +70,23 @@ for idxc=1:length(C)
                  if HV(i)==0
                      tao_serv(i)=1000000;
                  else
-                     tao_serv(i)=tao_serv(i)+ms*(HV(i)/sum(HV(1:C(idxc))));
+                     tao_serv(i)=tao_serv(i)+ms*(HV(i)/sum(HV(1:C(idxc))));%Recursos proporcionados por la red CDN
                  end           
              end
-             TAO_MW=tao_mw+tao_serv;
+             TAO_MW=tao_mw+tao_serv;%Total de recursos para TVS
              
-             tao_min=min(tao_cw,TAO_MW);%Tasa promedio de descarga en la ventana i
+             tao_min=min(tao_cw,TAO_MW);%Tasa efectiva de descarga en la ventana i
          
-             %Obtener V.A con las tasas de arribo, abandono,
+             %Obtener V.A con las tasas de conexión, desconexión,
              %producción(tranferencia inferior) y transferencia superior            
     
-             VEArr=exprnd(TArr);%V.A para arribos
-             ab=exprnd(1./TAb);%Vector de V.A para abandonos
-             VEPw=exprnd(ttran);%Vector de V.A para tranferencias inferiores
-             tran=exprnd(1./tao_min);%Vector de V.A para transferencias superiores
+             VEArr=exprnd(TArr);%V.A para las conexiones
+             ab=exprnd(1./TAb);%V.A para las desconexiones
+             VEPw=exprnd(ttran);%V.A para tranferencias inferiores
+             tran=exprnd(1./tao_min);%V.A para transferencias superiores
 
-             %Tiempos infinitos para descartar un abandono o transferencia
-             %inválido             
+             %Tiempos infinitos para descartar una desconexión 
+
              for idxab=1:C(idxc)+1%Cambir el vector a infinitos para descartar poblaciones en 0
                  if(ab(idxab)==0)
                     tab(idxab)=1000000;
@@ -104,19 +105,19 @@ for idxc=1:length(C)
 %              end
 %              VEPw=min(TProd);% Obtener minimo de prod
 
-             for idxtao=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
-                 if(tran(idxtao)==0)
-                    TTran(idxtao)=1000000;
-                 else
-                    TTran(idxtao)=tran(idxtao);
-                 end
-             end
-             VETao=min(TTran);% Obtener minimo de tran
+%              for idxtao=1:C(idxc)%Cambir el vector a infinitos para descartar poblaciones en 0
+%                  if(tran(idxtao)==0)
+%                     TTran(idxtao)=1000000;
+%                  else
+%                     TTran(idxtao)=tran(idxtao);
+%                  end
+%              end
+              VETao=min(tran);% Obtener minimo de tran
 
              %Obtener el evento que ocurrio
-             Evsucces1=min(VEArr,VEAb);
-             Evsucces2=min(VEPw,VETao);
-             Evfinal=min(Evsucces1,Evsucces2);
+             Evsucces1=min(VEArr,VEAb);%minimo entre la conexión y la desconexión
+             Evsucces2=min(VEPw,VETao);%minimo entre la producción y la TVS
+             Evfinal=min(Evsucces1,Evsucces2);%Evento final que ocurrio
 
              %Incrementar o decrementar la población de una ventana dependiendo 
              %del evento ocurrido y de la ventana en donde ocurrio
@@ -124,36 +125,36 @@ for idxc=1:length(C)
              if Evfinal==VEAb
 
                 idx=find(ab==VEAb);%Encontrar indice donde ab == VEAb
-                HV(idx)=HV(idx)-1;%Decrementar W en idx
-                tp=tp+VEAb;%Se suma el tiempo promedio a tp en idx
+                HV(idx)=HV(idx)-1;%Decrementar HV en idx
+                tp=tp+VEAb;%Se suma la V.A del evento ocurrido a tp en idx
 
              elseif Evfinal==VEArr
 
-                HV(1)=HV(1)+1;%Incrementar W en 1
-                tp=tp+VEArr;%Se suma el tiempo promedio a tp en 1
+                HV(1)=HV(1)+1;%Incrementar HV(1) en 1
+                tp=tp+VEArr;%Se suma la V.A del evento ocurrido a tp en idx
                 
              elseif Evfinal==VEPw
-                for idx=1:C(idxc)
-                    HV(idx)=HV(idx+1);%Decrementar W en i
+                for idx=1:C(idxc)%HV(a,b,d,C)->HV(b,d,C,0)
+                    HV(idx)=HV(idx+1);
                 end    
                 HV(C(idxc)+1)=0;
-                tp=tp+VEPw;%Se suma el tiempo promedio a tp en idx
+                tp=tp+VEPw;%Se suma la V.A del evento ocurrido a tp en idx
 
              elseif Evfinal==VETao
-                idx=find(tran==VETao);%Encontrar indice donde ab == VEAb
-                HV(idx)=HV(idx)-1;%Decrementar W en idx
-                HV(idx+1)=HV(idx+1)+1;%Incrementar W en idx+1
-                tp=tp+VETao;%Se suma el tiempo promedio a tp en idx
+                idx=find(tran==VETao);%Encontrar indice donde tran == VETao
+                HV(idx)=HV(idx)-1;%Decrementar HV en idx
+                HV(idx+1)=HV(idx+1)+1;%Incrementar HV en idx+1
+                tp=tp+VETao;%Se suma la V.A del evento ocurrido a tp en idx
                 tiempotran=tiempotran+VETao;
-                BW=BW+(tao_cw*VETao);
+                bw_iter=bw_iter+(tao_cw*VETao);
                 for ind=1:C(idxc)
                     if tao_cw(ind)>TAO_MW(ind)
-                       BWP2P(ind)=BWP2P(ind)+(tao_mw(ind)*VETao);
-                       BWSer(ind)=BWSer(ind)+(tao_serv(ind)*VETao);
+                       bwp2p_iter(ind)=bwp2p_iter(ind)+(tao_mw(ind)*VETao);
+                       bwserv_iter(ind)=bwserv_iter(ind)+(tao_serv(ind)*VETao);
                     else
                        m=min(tao_cw(ind),tao_mw(ind));
-                       BWP2P(ind)=BWP2P(ind)+(m*VETao);
-                       BWSer(ind)=BWSer(ind)+((tao_cw(ind)-m)*VETao);
+                       bwp2p_iter(ind)=bwp2p_iter(ind)+(m*VETao);
+                       bwserv_iter(ind)=bwserv_iter(ind)+((tao_cw(ind)-m)*VETao);
                     end
                 end
              end
