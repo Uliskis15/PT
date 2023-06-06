@@ -183,7 +183,8 @@ for i=1:C(idxc)
     if x_prom(i)==0
        tao_mwe(i)=1000000;
     else
-       for k=i+1:C(idxc)+1
+        ls=min(i+Q,C(idxc)+1);
+       for k=i+1:ls
            tao_mwe(i)=tao_mwe(i)+(mw*x_prom(i)*(x_prom(k)/sum(x_prom(1:k-1))));%Tasa promedio de descarga en penuria
        end
     end

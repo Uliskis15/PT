@@ -3,7 +3,7 @@ close all
 
 %Declaración de Variables
 C=[36];% Número de ventanas
-Q=[12 24 36];;%Número de ventanas hacia atrás 
+Q=[12 24 36];%Número de ventanas hacia atrás 
 teta=[2].*(10^-3);%Tasa de desconexión general
 lmb=0.04;%Tasa de conexión 
 c=0.00407;%Tasa de descarga general
@@ -13,6 +13,9 @@ X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 bw_iter=zeros(length(Q),C);%Cadena acumulativa para obtener el promedio por iteración
 bwp2p_iter=zeros(length(Q),C);%Cadena acumulativa para obtener el promedio por iteración
 bwserv_iter=zeros(length(Q),C);%Cadena acumulativa para obtener el promedio por iteración
+bw_estable=zeros(length(Q),C);%Variable de ancho de banda total consumido en estado estable
+bwp2p_estable=zeros(length(Q), C);%Variable de ancho de banda consumido de la red p2p en estado estable
+bwserv_estable=zeros(length(Q), C);%Variable de ancho de banda consumido de la red cdn en estado estable
 IT=1000000;%Número de iteraciones para la simulación
 
 for idxq=1:length(Q)
@@ -59,7 +62,7 @@ for idxq=1:length(Q)
                      if HV(i)==0
                          tao_mw(i)=1000000;
                      else
-                         ls=min(i+Q,C(idxc)+1);
+                         ls=min(i+Q(idxq),C(idxc)+1);
                          for k=i+1:ls
                              tao_mw(i)=tao_mw(i)+(mw*HV(i)*(HV(k)/sum(HV(1:k-1))));%Recursos proporcionados por la red p2p
                          end
@@ -152,17 +155,51 @@ for idxq=1:length(Q)
 
        end        
     end
+    
+    bw_estable(idxq,:)=cw*x_prom(1:C(idxc));
+    tao_mwe=zeros(1,C(idxc));%Recursos peers en estado estable
+    tao_serve=zeros(1,C(idxc));%Recursos servidores en estado estable
+    for i=1:C(idxc)
+        if x_prom(i)==0
+           tao_mwe(i)=1000000;
+        else
+            ls=min(i+Q(idxq),C(idxc)+1);
+           for k=i+1:ls
+               tao_mwe(i)=tao_mwe(i)+(mw*x_prom(i)*(x_prom(k)/sum(x_prom(1:k-1))));%Tasa promedio de descarga en penuria
+           end
+        end
+    end
+
+    for i=1:C(idxc)
+        if x_prom(i)==0
+           tao_serve(i)=1000000;
+        else
+           tao_serve(i)=tao_serve(i)+ms*(x_prom(i)/sum(x_prom(1:C(idxc))));
+        end           
+    end
+    TAO_MWE=tao_mwe+tao_serve;
+
+    for ind=1:C(idxc)
+        if bw_estable(idxq,ind)>TAO_MWE(ind)
+           bwp2p_estable(idxq,ind)=tao_mwe(ind);
+           bwserv_estable(idxq,ind)=tao_serve(ind);
+        else
+           m_e=min(bw_estable(idxq,ind),tao_mwe(ind));
+           bwp2p_estable(idxq,ind)=m_e;
+           bwserv_estable(idxq,ind)=bw_estable(idxq,ind)-m_e;
+        end
+    end
 end
-Bdc=[sum(bw_iter(1,:)) sum(bw_iter(2,:)) sum(bw_iter(3,:))];
-Bdcp2p=[sum(bwp2p_iter(1,:)) sum(bwp2p_iter(2,:)) sum(bwp2p_iter(3,:))];
-Bdcser=[sum(bwserv_iter(1,:)) sum(bwserv_iter(2,:)) sum(bwserv_iter(3,:))];
+Bdc=[sum(bw_estable(1,:)) sum(bw_estable(2,:)) sum(bw_estable(3,:))];
+Bdcp2p=[sum(bwp2p_estable(1,:)) sum(bwp2p_estable(2,:)) sum(bwp2p_estable(3,:))];
+Bdcser=[sum(bwserv_estable(1,:)) sum(bwserv_estable(2,:)) sum(bwserv_estable(3,:))];
 
 figure(1)
-plot(0:C-1,bw_iter(1,:)/tiempotran,'b','LineWidth',1.5)
+plot(0:C-1,bw_estable(1,:),'b','LineWidth',1.5)
 xlim([0 C])
 hold on
-plot(0:C-1,bw_iter(2,:)/tiempotran,'m--','LineWidth',1)
-plot(0:C-1,bw_iter(3,:)/tiempotran,'c*','LineWidth',0.5)
+plot(0:C-1,bw_estable(2,:),'m--','LineWidth',1)
+plot(0:C-1,bw_estable(3,:),'c*','LineWidth',0.5)
 hold off
 legend('Q=12','Q=24','Q=36')
 xlabel('\iti')
@@ -170,11 +207,11 @@ ylabel('Ventanas/segundo')
 title('Ancho de Banda Total Consumido en el Sistema')
 
 figure(2)
-plot(0:C-1,bwp2p_iter(1,:)/tiempotran,'b','LineWidth',1.5)
+plot(0:C-1,bwp2p_estable(1,:),'b','LineWidth',1.5)
 xlim([0 C])
 hold on
-plot(0:C-1,bwp2p_iter(2,:)/tiempotran,'m--','LineWidth',1)
-plot(0:C-1,bwp2p_iter(3,:)/tiempotran,'c*','LineWidth',0.5)
+plot(0:C-1,bwp2p_estable(2,:),'m--','LineWidth',1)
+plot(0:C-1,bwp2p_estable(3,:),'c*','LineWidth',0.5)
 hold off
 legend('Q=12','Q=24','Q=36')
 xlabel('\iti')
@@ -182,23 +219,23 @@ ylabel('Ventanas/segundo')
 title('Ancho de Banda Consumido de la Red \itP2P')
 
 figure(3)
-plot(0:C-1,bwserv_iter(1,:)/tiempotran,'b','LineWidth',1.5)
+plot(0:C-1,bwserv_estable(1,:),'b','LineWidth',1.5)
 xlim([0 C])
 hold on
-plot(0:C-1,bwserv_iter(2,:)/tiempotran,'m--','LineWidth',1)
-plot(0:C-1,bwserv_iter(3,:)/tiempotran,'c*','LineWidth',0.5)
+plot(0:C-1,bwserv_estable(2,:),'m--','LineWidth',1)
+plot(0:C-1,bwserv_estable(3,:),'c*','LineWidth',0.5)
 hold off
 legend('Q=12','Q=24','Q=36')
-%xticks([0:2:C])
-xlabel('\iti')
+xlabel('i')
 ylabel('Ventanas/segundo')
 title('Ancho de Banda Consumido de la Red \itCDN')
 
 figure(4)
-plot(Bdc/tiempotran,'b-*','LineWidth',0.5)
+plot(Bdc,'b-*','LineWidth',0.5)
+xlim([1 3])
 hold on
-plot(Bdcp2p/tiempotran,'r--','LineWidth',0.5)
-plot(Bdcser/tiempotran,'m','LineWidth',0.5)
+plot(Bdcp2p,'r--','LineWidth',0.5)
+plot(Bdcser,'m','LineWidth',0.5)
 hold off
 legend('BDC','BWP2P','BWServ')
 xticks([12 24 36])
