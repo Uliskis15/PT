@@ -3,13 +3,14 @@ close all
 
 %Declaración de Variables
 
-C=[36];% Número de ventanas
-teta=[2].*(10^-3);%Tasa de desconexión general
+C=[36 32 28 24 20 16 12];% Número de ventanas
+teta=[2 4 6 8 10].*(10^-3);%Tasa de desconexión general
 lmb=0.04;%Tasa de conexión 
 c=0.00407;%Tasa de descarga general
 mu=0.00255;%Tasa de subida general
 ms=1.24;%Tasa de subida red CDN
 X_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
+CX_prom=zeros(length(C),length(teta));%Matriz de downloaders promedio
 IT=1000000;%Número de iteraciones para la simulación
 
 for idxc=1:length(C)
@@ -19,10 +20,12 @@ for idxc=1:length(C)
       cw=C(idxc)*c;%Tasa de descarga promedio de un peer
       mw=C(idxc)*mu;%Tasa de subida promedio de un peer
       Pw=0.5*cw;%Tasa de producción del video
-      teta0=(teta+Pw);%Tasa de desconexión para peers en la ventana 0
+      teta0=(teta(idxt)+Pw);%Tasa de desconexión para peers en la ventana 0
       HV=zeros(1,C(idxc)+1);%Vector de poblaciones por ventana en la hiperventana
       xi_prom=0;%Acumulador para obtener poblaciones por iteración
+      cxi_prom=0;%Acumulador para obtener poblaciones por iteración
       x_prom=0;%Variable para promediar las poblaciones por iteración
+      cx_prom=0;%Variable para promediar las poblaciones por iteración
       bw_iter=zeros(1,C(idxc));%Variable de ancho de banda total consumido por iteración
       bwp2p_iter=zeros(1,C(idxc));%Variable de ancho de banda consumido de la red P2P por iteración
       bwserv_iter=zeros(1,C(idxc));%Variable de ancho de banda consumido de la red CDN por iteración
@@ -139,82 +142,37 @@ for idxc=1:length(C)
                     end
                 end
              end
-             xi_prom=xi_prom+(HV(1:C(idxc)+1)*Evfinal); 
+             xi_prom=xi_prom+(sum(HV(1:C(idxc)+1))*Evfinal); 
+             cxi_prom=cxi_prom+(HV(C(idxc)+1)*Evfinal); 
           end
       end 
       x_prom=xi_prom/tp;
+      cx_prom=cxi_prom/tp;
      
          %Obtener los promedios de seeds y downloaders para distintos
          %valores  de N y teta 
-%          X_prom(idxc,idxt)=x_prom;
+          X_prom(idxc,idxt)=x_prom;
+          CX_prom(idxc,idxt)=cx_prom;
 
    end        
 end
 
 figure(1)
-plot(0:C,x_prom,'b-*','LineWidth',0.5)
-ylim([0 max(x_prom)+0.2])
-xlim([0 C])
-xlabel('\iti')
-ylabel('\itDownloaders')
+surf(C,teta,transpose(X_prom),'FaceAlpha',0.5)
+xticks([12:4:36])
+yticks([0.002:0.001:0.01])
+zlim([0 8])
+ylabel('\theta')
+xlabel('C')
+zlabel('x')
 title('Número de \itDownloaders Promedio')
 
 figure(2)
-plot(0:C-1,bw_iter/tiempotran,'b-*','LineWidth',0.5)
-xlim([0 C])
-hold on
-plot(0:C-1,bwp2p_iter/tiempotran,'r--','LineWidth',0.5)
-plot(0:C-1,bwserv_iter/tiempotran,'m','LineWidth',0.5)
-hold off
-legend('C_\omega*X_i','BWP2P','BWServ')
-xlabel('\iti')
-ylabel('Ventanas/segundo')
-title('Anchos de Banda Consumidos en el Sistema')
-
-bw_estable=cw*x_prom(1:C(idxc));%Variable de ancho de banda total consumido en estado estable
-bwp2p_estable=zeros(1, C(idxc));%Variable de ancho de banda consumido de la red p2p en estado estable
-bwserv_estable=zeros(1, C(idxc));%Variable de ancho de banda consumido de la red cdn en estado estable
-tao_mwe=zeros(1,C(idxc));%Recursos peers en estado estable
-tao_serve=zeros(1,C(idxc));%Recursos servidores en estado estable
-
-for i=1:C(idxc)
-    if x_prom(i)==0
-       tao_mwe(i)=1000000;
-    else
-       for k=i+1:C(idxc)+1
-           tao_mwe(i)=tao_mwe(i)+(mw*x_prom(i)*(x_prom(k)/sum(x_prom(1:k-1))));%Tasa promedio de descarga en penuria
-       end
-    end
-end
-             
-for i=1:C(idxc)
-    if x_prom(i)==0
-       tao_serve(i)=1000000;
-    else
-       tao_serve(i)=tao_serve(i)+ms*(x_prom(i)/sum(x_prom(1:C(idxc))));
-    end           
-end
-TAO_MWE=tao_mwe+tao_serve;%Total de recursos para TVS
-
-for ind=1:C(idxc)
-    if bw_estable(ind)>TAO_MWE(ind)
-       bwp2p_estable(ind)=tao_mwe(ind);
-       bwserv_estable(ind)=tao_serve(ind);
-    else
-       m_e=min(bw_estable(ind),tao_mwe(ind));
-       bwp2p_estable(ind)=m_e;
-       bwserv_estable(ind)=bw_estable(ind)-m_e;
-    end
-end
-
-figure(3)
-plot(0:C-1,bw_estable,'b-*','LineWidth',0.5)
-xlim([0 C])
-hold on
-plot(0:C-1,bwp2p_estable,'r--','LineWidth',0.5)
-plot(0:C-1,bwserv_estable,'m','LineWidth',0.5)
-hold off
-legend('C_\omega*X_i','BWP2P','BWServ')
-xlabel('\iti')
-ylabel('Ventanas/segundo')
-title('Anchos de Banda Consumidos en el Sistema')
+surf(C,teta,transpose(CX_prom),'FaceAlpha',0.5)
+xticks([12:4:36])
+yticks([0.002:0.001:0.01])
+zlim([0 2])
+ylabel('\theta')
+xlabel('C')
+zlabel('x')
+title('Número de \itDownloaders Promedio en la Ventana C')

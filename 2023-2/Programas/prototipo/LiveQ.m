@@ -3,7 +3,8 @@ close all
 
 %Declaración de Variables
 
-C=[36];% Número de ventanas
+C=[12];% Número de ventanas
+Q=4;%Número de ventanas hacia atrás 
 teta=[2].*(10^-3);%Tasa de desconexión general
 lmb=0.04;%Tasa de conexión 
 c=0.00407;%Tasa de descarga general
@@ -58,7 +59,8 @@ for idxc=1:length(C)
                  if HV(i)==0
                      tao_mw(i)=1000000;
                  else
-                     for k=i+1:C(idxc)+1
+                     ls=min(i+Q,C(idxc)+1);
+                     for k=i+1:ls
                          tao_mw(i)=tao_mw(i)+(mw*HV(i)*(HV(k)/sum(HV(1:k-1))));%Recursos proporcionados por la red p2p
                      end
                  end           
