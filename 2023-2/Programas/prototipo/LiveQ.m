@@ -3,8 +3,8 @@ close all
 
 %Declaración de Variables
 
-C=[12];% Número de ventanas
-Q=4;%Número de ventanas hacia atrás 
+C=[24];% Número de ventanas
+Q=24;%Número de ventanas hacia atrás 
 teta=[2].*(10^-3);%Tasa de desconexión general
 lmb=0.04;%Tasa de conexión 
 c=0.00407;%Tasa de descarga general
@@ -155,6 +155,8 @@ end
 
 figure(1)
 plot(0:C,x_prom,'b-*','LineWidth',0.5)
+grid on
+grid minor
 ylim([0 max(x_prom)+0.2])
 xlim([0 C])
 xlabel('\iti')
@@ -163,6 +165,8 @@ title('Número de \itDownloaders Promedio')
 
 figure(2)
 plot(0:C-1,bw_iter/tiempotran,'b-*','LineWidth',0.5)
+grid on
+grid minor
 xlim([0 C])
 hold on
 plot(0:C-1,bwp2p_iter/tiempotran,'r--','LineWidth',0.5)
@@ -212,6 +216,8 @@ end
 
 figure(3)
 plot(0:C-1,bw_estable,'b-*','LineWidth',0.5)
+grid on
+grid minor
 xlim([0 C])
 hold on
 plot(0:C-1,bwp2p_estable,'r--','LineWidth',0.5)
