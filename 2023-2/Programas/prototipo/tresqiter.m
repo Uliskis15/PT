@@ -159,6 +159,8 @@ Bdcser=[sum(bwserv_iter(1,:)) sum(bwserv_iter(2,:)) sum(bwserv_iter(3,:))];
 
 figure(1)
 plot(0:C-1,bw_iter(1,:)/tiempotran,'b','LineWidth',1.5)
+grid on
+grid minor
 xlim([0 C])
 hold on
 plot(0:C-1,bw_iter(2,:)/tiempotran,'m--','LineWidth',1)
@@ -171,6 +173,8 @@ title('Ancho de Banda Total Consumido en el Sistema')
 
 figure(2)
 plot(0:C-1,bwp2p_iter(1,:)/tiempotran,'b','LineWidth',1.5)
+grid on
+grid minor
 xlim([0 C])
 hold on
 plot(0:C-1,bwp2p_iter(2,:)/tiempotran,'m--','LineWidth',1)
@@ -183,6 +187,8 @@ title('Ancho de Banda Consumido de la Red \itP2P')
 
 figure(3)
 plot(0:C-1,bwserv_iter(1,:)/tiempotran,'b','LineWidth',1.5)
+grid on
+grid minor
 xlim([0 C])
 hold on
 plot(0:C-1,bwserv_iter(2,:)/tiempotran,'m--','LineWidth',1)
@@ -195,6 +201,8 @@ title('Ancho de Banda Consumido de la Red \itCDN')
 
 figure(4)
 plot(Bdc/tiempotran,'b-*','LineWidth',0.5)
+grid on
+grid minor
 hold on
 plot(Bdcp2p/tiempotran,'r--','LineWidth',0.5)
 plot(Bdcser/tiempotran,'m','LineWidth',0.5)
