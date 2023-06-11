@@ -171,11 +171,13 @@ for idxc=1:length(C)
 end
 figure(1)
 plot(0:C,x_prom,'b-*','LineWidth',0.5)
+grid on
+grid minor
 ylim([0 max(x_prom)+0.2])
 xlim([0 C])
 xticks([0:2:C])
 xlabel('C')
-ylabel('Dounloaders')
+ylabel('Downloaders')
 title('Número de downloader promedio')
 
 figure(2)

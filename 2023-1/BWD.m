@@ -156,6 +156,8 @@ end
      
 figure(1)
 plot(0:1:24,BwidthD,'-o')
+grid on
+grid minor
 xticks([0:1:24])
 %yticks([0:max(BwidthD)])
 xlabel('C')

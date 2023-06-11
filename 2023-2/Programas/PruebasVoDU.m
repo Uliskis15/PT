@@ -132,6 +132,8 @@ end
      
 figure(1)
 plot(0:N-1,w_prom,'b-o','LineWidth',0.5)
+grid on
+grid minor
 %xticks([0:2:N])
 ylim([0 max(w_prom)+0.2])
 xlabel('N')
